@@ -1,39 +1,85 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <groupId>org.bgee.log4jdbc-log4j2</groupId>
-    <artifactId>log4jdbc-log4j2</artifactId>
-    <version>1.16</version>
-  </parent>
-  
-  <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+
+  <groupId>net.disy.oss</groupId>
+  <artifactId>log4jdbc</artifactId>
+  <version>2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>log4jdbc-log4j2-jdbc4.1</name>
-  
+
+  <name>log4jdbc</name>
+  <description>A library to log JDBC calls to the database.</description>
+  <url>https://github.com/DisyInformationssysteme/log4jdbc</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>11</java.version>
+  </properties>
+
   <dependencies>
-  
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.26</version>
+    </dependency>
   </dependencies>
 
-  <!-- in order to compile with JDK 1.7 -->
   <build>
-      <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <version>3.1</version>
-              <configuration>
-                  <!-- 
-                  Here we assume that the default JDK version on the machine compiling the project 
-                  is 1.7. Otherwise, you need to provide the path to the JDK 1.7 
-                  (see for instance the pom.xml in log4jdbc-log4j2-jdbc4, using a JDK 1.6)
-                  -->
-                  <source>1.7</source>
-                  <target>1.7</target>
-              </configuration>
-          </plugin>
-      </plugins>
-      <finalName>log4jdbc-log4j2-jdbc4.1-${project.version}</finalName>
-  </build>  
-  
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>net.disy.oss.log4jdbc</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>disy.internal-snapshots</id>
+      <url>${disy.internal-snapshots.deploy.url}</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <scm>
+    <url>https://github.com/DisyInformationssysteme/log4jdbc</url>
+    <connection>scm:git:https://github.com/DisyInformationssysteme/log4jdbc.git</connection>
+    <developerConnection>scm:git:git@github.com:DisyInformationssysteme/log4jdbc.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/DisyInformationssysteme/log4jdbc/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>Apache 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
 </project>
+
