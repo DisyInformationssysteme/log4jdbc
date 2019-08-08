@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql;
+package net.disy.oss.log4jdbc.sql;
 
 /**
  * Common interface that all Spy classes can implement.

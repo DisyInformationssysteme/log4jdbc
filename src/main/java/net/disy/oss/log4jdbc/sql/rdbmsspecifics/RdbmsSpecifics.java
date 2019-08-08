@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.rdbmsspecifics;
+package net.disy.oss.log4jdbc.sql.rdbmsspecifics;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-import net.sf.log4jdbc.Properties;
+import net.disy.oss.log4jdbc.Properties;
 
 
 /**
@@ -86,7 +86,7 @@ public class RdbmsSpecifics
 		StringBuilder out = new StringBuilder();
 		for (int i=0, j=in.length(); i < j; i++)
 		{
-			char c = in.charAt(i); 
+			char c = in.charAt(i);
 			if (c == '\'')
 			{
 				out.append(c);

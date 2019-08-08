@@ -1,14 +1,14 @@
-package net.sf.log4jdbc.log.log4j2.message;
+package net.disy.oss.log4jdbc.log.log4j2.message;
 
-import net.sf.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.Spy;
 
 import org.apache.logging.log4j.message.Message;
 
 /**
  * <code>SqlMessage</code> related to the logging of <code>Exception</code>s.
- * 
+ *
  * @author Frederic Bastian
- * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#exceptionOccured(Spy, String, Exception, String, long)
+ * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#exceptionOccured(net.disy.oss.log4jdbc.sql.Spy, String, Exception, String, long)
  * @version 1.0
  * @since 1.0
  */
@@ -16,39 +16,39 @@ public class ExceptionOccuredMessage extends SqlMessage implements Message
 {
     private static final long serialVersionUID = 4033892630843448750L;
     /**
-     * the <code>Spy</code> wrapping the class that threw an <code>Exception</code>. 
+     * the <code>Spy</code> wrapping the class that threw an <code>Exception</code>.
      * Will be used to build the <code>message</code>, only when needed.
      * @see #message
      * @see #buildMessage()
      */
 	private Spy spy;
 	/**
-     * a <code>String</code> describing the name and call parameters 
-     * of the method generated the <code>Exception</code>. 
+     * a <code>String</code> describing the name and call parameters
+     * of the method generated the <code>Exception</code>.
      * Will be used to build the <code>message</code>, only when needed.
      * @see #message
      * @see #buildMessage()
      */
 	private String methodCall;
 	/**
-     * <code>long</code> representing the amount of time 
+     * <code>long</code> representing the amount of time
      * that passed before an <code>Exception</code> was thrown when sql was being executed.
-     * Optional and should be set to -1 if not used. 
+     * Optional and should be set to -1 if not used.
      * Will be used to build the <code>message</code>, only when needed.
      * @see #message
      * @see #buildMessage()
      */
 	private long execTime;
 	/**
-     * <code>String</code> representing the sql that occurred 
-     * just before the exception occurred. 
+     * <code>String</code> representing the sql that occurred
+     * just before the exception occurred.
      * Optional and <code>null</code> if not used.
      * Will be used to build the <code>message</code>, only when needed.
      * @see #message
      * @see #buildMessage()
      */
 	private String sql;
-    
+
     /**
      * Default constructor
      */
@@ -57,41 +57,41 @@ public class ExceptionOccuredMessage extends SqlMessage implements Message
     	this(null, null, null, -1, false);
     }
     /**
-     * 
+     *
      * @param spy        	the <code>Spy</code> wrapping the class that threw an <code>Exception</code>.
-     * @param methodCall 	a <code>String</code> describing the name and call parameters 
+     * @param methodCall 	a <code>String</code> describing the name and call parameters
      * 						of the method generated the <code>Exception</code>.
      * @param e          	the <code>Exception</code> that was thrown.
-     * @param sql        	optional <code>String</code> representing the sql that occurred 
+     * @param sql        	optional <code>String</code> representing the sql that occurred
      * 						just before the exception occurred.
-     * @param execTime   	optional <code>long</code> representing the amount of time 
+     * @param execTime   	optional <code>long</code> representing the amount of time
      * 						that passed before an <code>Exception</code> was thrown when sql was being executed.
      *                   	caller should pass -1 if not used.
      * @param isDebugEnabled A <code>boolean</code> to define whether debugInfo should be displayed.
      */
-    public ExceptionOccuredMessage(Spy spy, String methodCall, 
+    public ExceptionOccuredMessage(Spy spy, String methodCall,
 	        String sql, long execTime, boolean isdebugEnabled) {
-    	
+
 		super(isdebugEnabled);
-		
+
 		this.spy = spy;
 		this.methodCall = methodCall;
 		this.sql = sql;
 		this.execTime = execTime;
     }
-    
+
     /**
-     * Populate the <code>message</code> attribute 
+     * Populate the <code>message</code> attribute
      * using the attributes of this class.
-     * This method is called only when this <code>Message</code> is actually logged, 
+     * This method is called only when this <code>Message</code> is actually logged,
      * avoiding useless concatenation costs, etc.
-     * 
+     *
      * @see #message
      */
     protected void buildMessage()
     {
     	String tempMessage = "";
-    	
+
     	String classType = this.spy.getClassType();
     	Integer spyNo = this.spy.getConnectionNumber();
     	String header = spyNo + ". " + classType + "." + this.methodCall;
@@ -104,7 +104,7 @@ public class ExceptionOccuredMessage extends SqlMessage implements Message
 
     		// if at debug level, display debug info to error log
     		if (this.isDebugEnabled()) {
-    			tempMessage = SqlMessage.getDebugInfo() + SqlMessage.nl + spyNo + ". " + tempSql;
+    			tempMessage = getDebugInfo() + nl + spyNo + ". " + tempSql;
     		} else {
     			tempMessage = header + " FAILED! " + tempSql;
     		}
@@ -112,7 +112,7 @@ public class ExceptionOccuredMessage extends SqlMessage implements Message
     			tempMessage += " {FAILED after " + execTime + " ms}";
     		}
     	}
-    	
+
     	this.setMessage(tempMessage);
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql;
+package net.disy.oss.log4jdbc.sql;
 
 /**
  * Static utility methods for use throughout the project.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.rdbmsspecifics;
+package net.disy.oss.log4jdbc.sql.rdbmsspecifics;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;

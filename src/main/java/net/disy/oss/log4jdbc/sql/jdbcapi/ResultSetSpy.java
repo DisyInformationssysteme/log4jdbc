@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -37,10 +37,10 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector;
-import net.sf.log4jdbc.sql.resultsetcollector.ResultSetCollector;
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector;
+import net.disy.oss.log4jdbc.sql.resultsetcollector.ResultSetCollector;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a ResultSet and reports method calls, returns and exceptions.
@@ -53,7 +53,7 @@ import net.sf.log4jdbc.sql.resultsetcollector.ResultSetCollector;
 public class ResultSetSpy implements ResultSet, Spy
 {
   private final SpyLogDelegator log;
- 
+
   /**
    * Collects results from the result set spy method
    */
@@ -69,10 +69,10 @@ public class ResultSetSpy implements ResultSet, Spy
   {
     log.exceptionOccured(this, methodCall, exception, null, -1L);
   }
-  
+
   /**
-   * Give a chance to the <code>resultSetCollector</code> (if one is set) 
-   * to obtain a <code>ResultSetMetaData</code> before <code>realResultSet</code> 
+   * Give a chance to the <code>resultSetCollector</code> (if one is set)
+   * to obtain a <code>ResultSetMetaData</code> before <code>realResultSet</code>
    * is closed.
    * @see #close()
    */
@@ -82,7 +82,7 @@ public class ResultSetSpy implements ResultSet, Spy
 		  resultSetCollector.loadMetaDataIfNeeded(realResultSet);
 	  }
   }
-  
+
   /**
    * Report (for logging) that a method returned.  All the other reportReturn methods are convenience methods that call
    * this method.
@@ -92,26 +92,26 @@ public class ResultSetSpy implements ResultSet, Spy
    */
   protected void reportAllReturns(String methodCall, Object returnValue, Object... methodParams)
   {
-                
+
     if (resultSetCollector != null)
     {
-     
+
       // Give the result set collector a chance to do its work
       boolean finished = resultSetCollector.methodReturned(this, methodCall, returnValue, realResultSet, methodParams);
       if (finished)
       {
-                
+
         log.resultSetCollected(resultSetCollector);
         resultSetCollector.reset();
       }
     }
-    
+
     String toString = "void";
     if (returnValue != null) {
     	toString = returnValue.toString();
     }
     log.methodReturned(this, methodCall, toString);
-  }  
+  }
 
   private ResultSet realResultSet;
 
@@ -124,13 +124,13 @@ public class ResultSetSpy implements ResultSet, Spy
   {
     return realResultSet;
   }
-  
+
   /**
-   * Sets the <code>ResultSetCollector</code> used by this <code>ResultSetSpy</code> 
-   * to log result set content. Useful for developers who want to use 
-   * their own custom collector. 
-   * 
-   * @param resultSetCollector 	A <code>ResultSetCollector</code> used to collect 
+   * Sets the <code>ResultSetCollector</code> used by this <code>ResultSetSpy</code>
+   * to log result set content. Useful for developers who want to use
+   * their own custom collector.
+   *
+   * @param resultSetCollector 	A <code>ResultSetCollector</code> used to collect
    * 							the data of this <code>ResultSetSpy</code>.
    */
   public void setResultSetCollector(ResultSetCollector resultSetCollector)
@@ -145,10 +145,10 @@ public class ResultSetSpy implements ResultSet, Spy
    *
    * @param parent Statement that generated this ResultSet.
    * @param realResultSet real underlying ResultSet that is being wrapped.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
+   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
    * 						this <code>ResultSetSpy</code>.
    */
-  public ResultSetSpy(StatementSpy parent, ResultSet realResultSet, 
+  public ResultSetSpy(StatementSpy parent, ResultSet realResultSet,
 		  SpyLogDelegator logDelegator)
   {
     if (realResultSet == null)
@@ -186,12 +186,12 @@ public class ResultSetSpy implements ResultSet, Spy
    * @param methodCall description of method call and arguments passed to it that returned.
    * @param value return T.
    * @return the return Object as passed in.
-   */  
+   */
   protected <T> T reportReturn(String methodCall, T returnValue, Object... args)
   {
     reportAllReturns(methodCall, returnValue, args);
     return returnValue;
-  }  
+  }
 
   // forwarding methods
 
@@ -370,7 +370,7 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "getTimestamp(" + columnIndex + ", " + cal + ")";
     try
     {
-      return reportReturn(methodCall, realResultSet.getTimestamp(columnIndex, cal), 
+      return reportReturn(methodCall, realResultSet.getTimestamp(columnIndex, cal),
     		  columnIndex, cal);
     }
     catch (SQLException s)
@@ -387,7 +387,7 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "getTimestamp(" + columnName + ", " + cal + ")";
     try
     {
-      return reportReturn(methodCall, realResultSet.getTimestamp(columnName, cal), 
+      return reportReturn(methodCall, realResultSet.getTimestamp(columnName, cal),
     		  columnName, cal);
     }
     catch (SQLException s)
@@ -1526,20 +1526,20 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "close()";
     try
     {
-    	//this line fixes the issue 4 
+    	//this line fixes the issue 4
     	//http://code.google.com/p/log4jdbc-log4j2/issues/detail?id=4
-    	//Other alternatives would be possible, for instance, 
-    	//externalizing ResultSetCollector calls from reportAllReturns, 
-    	//and calling the new method here. This would have required changes to other methods 
-    	//of this class. 
+    	//Other alternatives would be possible, for instance,
+    	//externalizing ResultSetCollector calls from reportAllReturns,
+    	//and calling the new method here. This would have required changes to other methods
+    	//of this class.
     	this.loadMetaDataIfNeeded();
-    	
+
     	if (resultSetCollector != null)
         {
           // Give the result set collector a chance to fill in unread values from the result set row if that option has been selected
           resultSetCollector.preMethod(this, methodCall, (Object[]) null);
         }
-    	
+
         realResultSet.close();
     }
     catch (SQLException s)

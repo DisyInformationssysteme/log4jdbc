@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.log.slf4j;
+package net.disy.oss.log4jdbc.log.slf4j;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -21,14 +21,13 @@ import java.io.StringReader;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-
-import net.sf.log4jdbc.Properties;
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.jdbcapi.ConnectionSpy;
-import net.sf.log4jdbc.sql.jdbcapi.ResultSetSpy;
-import net.sf.log4jdbc.sql.resultsetcollector.ResultSetCollector;
-import net.sf.log4jdbc.sql.resultsetcollector.ResultSetCollectorPrinter;
+import net.disy.oss.log4jdbc.Properties;
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.jdbcapi.ConnectionSpy;
+import net.disy.oss.log4jdbc.sql.jdbcapi.ResultSetSpy;
+import net.disy.oss.log4jdbc.sql.resultsetcollector.ResultSetCollector;
+import net.disy.oss.log4jdbc.sql.resultsetcollector.ResultSetCollectorPrinter;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -36,18 +35,18 @@ import org.slf4j.Logger;
 /**
  * Delegates JDBC spy logging events to the the Simple Logging Facade for Java (slf4j).
  * <p>
- * Modifications for log4j2: 
+ * Modifications for log4j2:
  * <ul>
- * <li>Modification of the signature of the method <code>connectionOpened(Spy)</code> into 
- * <code>connectionOpened(Spy, long)</code>, to accept a parameter <code>execTime</code>, 
- * defining the time elapsed to open the connection in ms. This new method simply delegates 
- * to the formerly existing method, now private, so that the behavior of the slf4j logger is not modified. 
- * See <code>SpyLogDelegator</code> for more details. 
- * <li>Modification of the signature of the method <code>connectionClosed(Spy)</code> into 
- * <code>connectionClosed(Spy, long)</code>, to accept a parameter <code>execTime</code>, 
- * defining the time elapsed to open the connection in ms. This new method simply delegates 
- * to the formerly existing method, now private, so that the behavior of the slf4j logger is not modified. 
- * See <code>SpyLogDelegator</code> for more details. 
+ * <li>Modification of the signature of the method <code>connectionOpened(Spy)</code> into
+ * <code>connectionOpened(Spy, long)</code>, to accept a parameter <code>execTime</code>,
+ * defining the time elapsed to open the connection in ms. This new method simply delegates
+ * to the formerly existing method, now private, so that the behavior of the slf4j logger is not modified.
+ * See <code>SpyLogDelegator</code> for more details.
+ * <li>Modification of the signature of the method <code>connectionClosed(Spy)</code> into
+ * <code>connectionClosed(Spy, long)</code>, to accept a parameter <code>execTime</code>,
+ * defining the time elapsed to open the connection in ms. This new method simply delegates
+ * to the formerly existing method, now private, so that the behavior of the slf4j logger is not modified.
+ * See <code>SpyLogDelegator</code> for more details.
  * </ul>
  *
  * @author Arthur Blake
@@ -101,7 +100,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
     /**
      * Logger that shows the forward scrolled result sets in a table
      */
-    private final Logger resultSetTableLogger = LoggerFactory.getLogger("jdbc.resultsettable");  
+    private final Logger resultSetTableLogger = LoggerFactory.getLogger("jdbc.resultsettable");
 
     /**
      * Determine if any of the 5 log4jdbc spy loggers are turned on (jdbc.audit | jdbc.resultset |
@@ -160,7 +159,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
     public void methodReturned(Spy spy, String methodCall, String returnMsg)
     {
         String classType = spy.getClassType();
-        Logger logger=ResultSetSpy.classTypeDescription.equals(classType)?
+        Logger logger= ResultSetSpy.classTypeDescription.equals(classType)?
                 resultSetLogger:jdbcLogger;
         if (logger.isInfoEnabled())
         {
@@ -175,7 +174,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
                 logger.info(header);
             }
         }
-    }	
+    }
 
     @Override
     public void constructorReturned(Spy spy, String constructionInfo)
@@ -518,7 +517,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
     @Override
     public void connectionOpened(Spy spy, long execTime)
     {
-        //we just delegate to the already existing method, 
+        //we just delegate to the already existing method,
         //so that we do not change the behavior of the standard implementation
         this.connectionOpened(spy);
     }
@@ -531,7 +530,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
     private void connectionOpened(Spy spy)
     {
         if (connectionLogger.isDebugEnabled())
-        {		  
+        {
             connectionLogger.info(spy.getConnectionNumber() + ". Connection opened " +
                     getDebugInfo());
             connectionLogger.debug(ConnectionSpy.getOpenConnectionsDump());
@@ -545,7 +544,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
     @Override
     public void connectionClosed(Spy spy, long execTime)
     {
-        //we just delegate to the already existing method, 
+        //we just delegate to the already existing method,
         //so that we do not change the behavior of the standard implementation
         this.connectionClosed(spy);
     }
@@ -606,7 +605,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
 
     @Override
     public void resultSetCollected(ResultSetCollector resultSetCollector) {
-        String resultsToPrint = new ResultSetCollectorPrinter().getResultSetToPrint(resultSetCollector);    
+        String resultsToPrint = new ResultSetCollectorPrinter().getResultSetToPrint(resultSetCollector);
         resultSetTableLogger.info(resultsToPrint);
     }
 }

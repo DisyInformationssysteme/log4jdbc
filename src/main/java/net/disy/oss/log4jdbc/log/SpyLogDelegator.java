@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.log;
+package net.disy.oss.log4jdbc.log;
 
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.resultsetcollector.ResultSetCollector;
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.resultsetcollector.ResultSetCollector;
 
 /**
  * Delegates Spy events to a logger.
  * This interface is used for all logging activity used by log4jdbc and hides the specific implementation
  * of any given logging system from log4jdbc.
  * <p>
- * Modifications for log4j2: 
+ * Modifications for log4j2:
  * <ul>
- * <li>Modification of the signature of the method <code>connectionOpened(Spy)</code> into 
- * <code>connectionOpened(Spy, long)</code>, to accept a parameter <code>execTime</code>, 
- * defining the time elapsed to open the connection in ms. 
- * This information can be generated when a <code>ConnectionSpy</code> has been acquired 
- * through the use of <code>DriverSpy</code> (through a <code>DriverManager</code>), 
- * see <code>DriverSpy#connect(String, Properties)</code>. 
- * It cannot be generated when a <code>ConnectionSpy</code> has been directly instantiated 
- * (by providing an already instantiated <code>Connection</code> to the constructor 
- * <code>ConnectionSpy(Connection)</code>; Nevertheless, new constructors for <code>ConnectionSpy</code>, 
+ * <li>Modification of the signature of the method <code>connectionOpened(Spy)</code> into
+ * <code>connectionOpened(Spy, long)</code>, to accept a parameter <code>execTime</code>,
+ * defining the time elapsed to open the connection in ms.
+ * This information can be generated when a <code>ConnectionSpy</code> has been acquired
+ * through the use of <code>DriverSpy</code> (through a <code>DriverManager</code>),
+ * see <code>DriverSpy#connect(String, Properties)</code>.
+ * It cannot be generated when a <code>ConnectionSpy</code> has been directly instantiated
+ * (by providing an already instantiated <code>Connection</code> to the constructor
+ * <code>ConnectionSpy(Connection)</code>; Nevertheless, new constructors for <code>ConnectionSpy</code>,
  * accepting the execution time to open the connection, can be used).
- * <li>Modification of the signature of the method <code>connectionClosed(Spy)</code> into 
- * <code>connectionClosed(Spy, long)</code>, to accept a parameter <code>execTime</code>, 
- * defining the time elapsed to close the connection in ms. 
+ * <li>Modification of the signature of the method <code>connectionClosed(Spy)</code> into
+ * <code>connectionClosed(Spy, long)</code>, to accept a parameter <code>execTime</code>,
+ * defining the time elapsed to close the connection in ms.
  * This execution time can always be computed by <code>ConnectionSpy#close()</code>.
  * <li><code>Slf4jSpyLogDelegator</code> has been modified accordingly.
  * </ul>
@@ -107,33 +107,33 @@ public interface SpyLogDelegator
 
     /**
      * Called whenever a new connection spy is created.
-     * 
+     *
      * @param spy ConnectionSpy that was created.
      * @param execTime  A <code>long</code> defining the time elapsed to open the connection in ms
-     *          (useful information, as a connection might take some time to be opened sometimes). 
+     *          (useful information, as a connection might take some time to be opened sometimes).
      *                    Caller should pass -1 if not used or unknown.
      */
     public void connectionOpened(Spy spy, long execTime);
 
     /**
      * Called whenever a connection spy is closed.
-     * 
+     *
      * @param spy     <code>ConnectionSpy</code> that was closed.
      * @param execTime  A <code>long</code> defining the time elapsed to close the connection in ms
-     *          (useful information, as a connection might take some time to be closed sometimes). 
+     *          (useful information, as a connection might take some time to be closed sometimes).
      *                    Caller should pass -1 if not used or unknown.
      */
     public void connectionClosed(Spy spy, long execTime);
 
     /**
      * Called whenever a connection spy is aborted.
-     * 
+     *
      * @param spy     <code>ConnectionSpy</code> that was aborted.
      * @param execTime  A <code>long</code> defining the time elapsed to abort the connection in ms
-     *          (useful information, as a connection might take some time to be aborted sometimes). 
+     *          (useful information, as a connection might take some time to be aborted sometimes).
      *                    Caller should pass -1 if not used or unknown.
      */
-    public void connectionAborted(Spy spy, long execTime);  
+    public void connectionAborted(Spy spy, long execTime);
 
     /**
      * Log a Setup and/or administrative log message for log4jdbc.
@@ -151,7 +151,7 @@ public interface SpyLogDelegator
 
     /**
      * Determine whether the logger is expecting results sets to be collected
-     * AND any unread result set values read explicitly  
+     * AND any unread result set values read explicitly
      *
      * @return true if the logger is expecting results sets to be collected
      */
@@ -159,16 +159,16 @@ public interface SpyLogDelegator
 
     /**
      * Called whenever result set has been collected.
-     * 
+     *
      * This method will be actually called
      * when the <code>next()</code> method of the spied <code>ResultSet</code>
      * return <code>false</code> meaning that its end is reached.
-     * It will be also called if the <code>ResultSet</code> is closed. 
-     * 
+     * It will be also called if the <code>ResultSet</code> is closed.
+     *
      * @see net.sf.log4jdbc.ResultSetSpy
-     * @see net.sf.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector
+     * @see net.disy.oss.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector
 
-     */ 
+     */
     public void resultSetCollected(ResultSetCollector resultSetCollector);
 
 }

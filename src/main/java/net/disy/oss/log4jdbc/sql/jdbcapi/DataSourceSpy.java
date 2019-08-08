@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -24,10 +24,9 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.log.SpyLogFactory;
-import net.sf.log4jdbc.sql.Spy;
-
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
+import net.disy.oss.log4jdbc.log.SpyLogFactory;
 
 /**
  * A proxy datasource that can be used to wrap a real data source allowing log4jdbc to do its work on the real
@@ -76,8 +75,8 @@ import net.sf.log4jdbc.sql.Spy;
 public class DataSourceSpy implements DataSource, Spy {
 	private DataSource realDataSource;
 	/**
-	 * The <code>SpyLogDelegator</code> used by this <code>DataSource</code> 
-	 * and used by all resources obtained starting from this <code>DataSource</code> 
+	 * The <code>SpyLogDelegator</code> used by this <code>DataSource</code>
+	 * and used by all resources obtained starting from this <code>DataSource</code>
 	 * (<code>Connection</code>s, <code>ResultSet</code>s, ...).
 	 */
 	private SpyLogDelegator log;
@@ -91,25 +90,25 @@ public class DataSourceSpy implements DataSource, Spy {
 		this.realDataSource = realDataSource;
 		this.log = SpyLogFactory.getSpyLogDelegator();
 	}
-	
+
 	/**
-	 * Get the <code>SpyLogDelegator</code> that are used by all resources 
-	 * obtained starting from this <code>DataSource</code> 
-	 * (<code>Connection</code>s, <code>ResultSet</code>s, ...). 
-	 * @return 		The <code>SpyLogDelegator</code> currently used 
+	 * Get the <code>SpyLogDelegator</code> that are used by all resources
+	 * obtained starting from this <code>DataSource</code>
+	 * (<code>Connection</code>s, <code>ResultSet</code>s, ...).
+	 * @return 		The <code>SpyLogDelegator</code> currently used
 	 * 				by this <code>DataSource</code>.
 	 */
 	public SpyLogDelegator getLogDelegator() {
 		return this.log;
 	}
 	/**
-	 * Set a custom <code>SpyLogDelegator</code> to be used by all resources 
-	 * provided by this <code>DataSource</code>, rather than the default 
-	 * <code>SpyLogDelegator</code> returned by 
-	 * {@link net.sf.log4jdbc.log.SpyLogFactory#getSpyLogDelegator() 
+	 * Set a custom <code>SpyLogDelegator</code> to be used by all resources
+	 * provided by this <code>DataSource</code>, rather than the default
+	 * <code>SpyLogDelegator</code> returned by
+	 * {@link net.disy.oss.log4jdbc.log.SpyLogFactory#getSpyLogDelegator()
 	 * SpyLogFactory#getSpyLogDelegator()}.
-	 * @param spyLogDelegator	The <code>SpyLogDelegator</code> to be used by all resources 
-	 * 							obtained starting from this <code>DataSource</code> 
+	 * @param spyLogDelegator	The <code>SpyLogDelegator</code> to be used by all resources
+	 * 							obtained starting from this <code>DataSource</code>
 	 * 							(<code>Connection</code>s, <code>ResultSet</code>s, ...).
 	 */
 	public void setLogDelegator(SpyLogDelegator spyLogDelegator) {
@@ -124,7 +123,7 @@ public class DataSourceSpy implements DataSource, Spy {
 	protected void reportException(String methodCall, SQLException exception)
 	{
 		log.exceptionOccured(this, methodCall, exception, null, -1L);
-	}    
+	}
 
 	/**
 	 * Report to the logger all returns which have to be reported by this class
@@ -137,30 +136,30 @@ public class DataSourceSpy implements DataSource, Spy {
 	{
 		log.methodReturned(this, methodCall, "");
 		return value;
-	}    
+	}
 
 	@Override
 	public Connection getConnection() throws SQLException
-	{      
+	{
 		String methodCall = "getConnection()";
 		long tstart = System.currentTimeMillis();
 		try
 		{
 			final Connection connection = realDataSource.getConnection();
 			if (log.isJdbcLoggingEnabled()) {
-			    return (Connection) reportReturn(methodCall, 
-					new ConnectionSpy(connection, DriverSpy.getRdbmsSpecifics(connection), 
-							          System.currentTimeMillis() - tstart, this.log));  
+			    return (Connection) reportReturn(methodCall,
+					new ConnectionSpy(connection, DriverSpy.getRdbmsSpecifics(connection),
+							          System.currentTimeMillis() - tstart, this.log));
 			}
-			//if logging is not enable, return the real connection, 
-			//so that there is no useless costs 
+			//if logging is not enable, return the real connection,
+			//so that there is no useless costs
 			return connection;
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
-		}     
+			throw s;
+		}
 	}
 
 	@Override
@@ -168,24 +167,24 @@ public class DataSourceSpy implements DataSource, Spy {
 	{
 
 		String methodCall = "getConnection("+ username +", password***)";
-		long tstart = System.currentTimeMillis();      
+		long tstart = System.currentTimeMillis();
 		try
 		{
 			final Connection connection = realDataSource.getConnection(username, password);
 			if (log.isJdbcLoggingEnabled()) {
-			    return (Connection) reportReturn(methodCall, 
-					new ConnectionSpy(connection,DriverSpy.getRdbmsSpecifics(connection), 
-							          System.currentTimeMillis() - tstart, this.log));  
+			    return (Connection) reportReturn(methodCall,
+					new ConnectionSpy(connection,DriverSpy.getRdbmsSpecifics(connection),
+							          System.currentTimeMillis() - tstart, this.log));
 			}
-			//if logging is not enable, return the real connection, 
-			//so that there is no useless costs 
+			//if logging is not enable, return the real connection,
+			//so that there is no useless costs
 			return connection;
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
-		}     
+			throw s;
+		}
 
 	}
 
@@ -199,7 +198,7 @@ public class DataSourceSpy implements DataSource, Spy {
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
+			throw s;
 		}
 	}
 
@@ -213,7 +212,7 @@ public class DataSourceSpy implements DataSource, Spy {
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
+			throw s;
 		}
 	}
 
@@ -227,8 +226,8 @@ public class DataSourceSpy implements DataSource, Spy {
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
-		}      
+			throw s;
+		}
 	}
 
 	@Override
@@ -236,12 +235,12 @@ public class DataSourceSpy implements DataSource, Spy {
 		String methodCall = "setLoginTimeout("+ seconds +")";
 		try
 		{
-			realDataSource.setLoginTimeout(seconds);  
+			realDataSource.setLoginTimeout(seconds);
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
+			throw s;
 		}
 	}
 
@@ -255,8 +254,8 @@ public class DataSourceSpy implements DataSource, Spy {
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
-		}     
+			throw s;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -271,8 +270,8 @@ public class DataSourceSpy implements DataSource, Spy {
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
-		}    
+			throw s;
+		}
 	}
 
 	@Override
@@ -286,7 +285,7 @@ public class DataSourceSpy implements DataSource, Spy {
 		catch (SQLFeatureNotSupportedException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
+			throw s;
 		}
 	}
 

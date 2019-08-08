@@ -16,16 +16,16 @@
  */
 
 
-package net.sf.log4jdbc.sql.resultsetcollector;
+package net.disy.oss.log4jdbc.sql.resultsetcollector;
 
 import java.util.List;
 
 /***
  * @author Tim Azzopardi
- * @author Mathieu Seppey 
- * 
+ * @author Mathieu Seppey
+ *
  * Update : changed printResultSet into getResultSetToPrint
- * 
+ *
  */
 
 public class ResultSetCollectorPrinter {
@@ -46,20 +46,20 @@ public class ResultSetCollectorPrinter {
      * Return a table which represents a <code>ResultSet</code>,
      * to be printed by a logger,
      * based on the content of the provided <code>resultSetCollector</code>.
-     * 
+     *
      * This method will be actually called by a <code>SpyLogDelegator</code>
      * when the <code>next()</code> method of the spied <code>ResultSet</code>
      * return <code>false</code> meaning that its end is reached.
-     * It will be also called if the <code>ResultSet</code> is closed. 
-     * 
-     * 
+     * It will be also called if the <code>ResultSet</code> is closed.
+     *
+     *
      * @param resultSetCollector the ResultSetCollector which has collected the data we want to print
      * @return A <code>String</code> which contains the formatted table to print
-     * 
+     *
      * @see net.sf.log4jdbc.ResultSetSpy
-     * @see net.sf.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector
-     * @see net.sf.log4jdbc.log.SpyLogDelegator
-     * 
+     * @see DefaultResultSetCollector
+     * @see net.disy.oss.log4jdbc.log.SpyLogDelegator
+     *
      */
     public String getResultSetToPrint(ResultSetCollector resultSetCollector) {
 

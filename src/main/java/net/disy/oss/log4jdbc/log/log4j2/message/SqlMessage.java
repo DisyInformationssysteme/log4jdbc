@@ -1,4 +1,4 @@
-package net.sf.log4jdbc.log.log4j2.message;
+package net.disy.oss.log4jdbc.log.log4j2.message;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -6,18 +6,18 @@ import java.io.StringReader;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import net.sf.log4jdbc.Properties;
+import net.disy.oss.log4jdbc.Properties;
 
 /**
- * Parent class of all <code>Message</code>s associated with log4jdbc log events, 
+ * Parent class of all <code>Message</code>s associated with log4jdbc log events,
  * to perform common operations such as sql formatting.
  * <p>
- * Subclasses must implement the abstract <code>buildMessage()</code> method, 
- * that will then be called by the method <code>getFormattedMessage()</code> of this class, 
- * to populate the <code>message</code> attribute, only once. 
- * This way, messages are generated only once, and only when needed 
+ * Subclasses must implement the abstract <code>buildMessage()</code> method,
+ * that will then be called by the method <code>getFormattedMessage()</code> of this class,
+ * to populate the <code>message</code> attribute, only once.
+ * This way, messages are generated only once, and only when needed
  * (avoid useless strings concatenations for instance).
- * 
+ *
  * @author Frederic Bastian
  * @version 1.0
  * @since 1.0
@@ -25,7 +25,7 @@ import net.sf.log4jdbc.Properties;
 public abstract class SqlMessage
 {
 	/**
-	 * System dependent line separator. 
+	 * System dependent line separator.
 	 */
 	protected static String nl = System.getProperty("line.separator");
 	/**
@@ -34,7 +34,7 @@ public abstract class SqlMessage
 	 */
 	private boolean isDebugEnabled;
 	/**
-	 * A <code>String</code> representing the final message 
+	 * A <code>String</code> representing the final message
 	 * built when needed using the attributes of this class.
      * @see #buildMessage()
 	 */
@@ -57,15 +57,15 @@ public abstract class SqlMessage
     	this.setDebugEnabled(isDebugEnabled);
     	this.setMessage(null);
     }
-    
+
     /**
      * Populate the <code>message</code> attribute.
-     * All subclasses can implement this method as they want, 
-     * but the outcome must be to assign a <code>String</code> not <code>null</code> 
+     * All subclasses can implement this method as they want,
+     * but the outcome must be to assign a <code>String</code> not <code>null</code>
      * to the <code>message</code> attribute.
-     * This method is called only when this <code>Message</code> is actually logged, 
+     * This method is called only when this <code>Message</code> is actually logged,
      * avoiding useless concatenation costs, etc.
-     * 
+     *
      * @see #message
      */
     protected abstract void buildMessage();
@@ -84,7 +84,7 @@ public abstract class SqlMessage
 	public Object[] getParameters() {
 		return null;
 	}
-	
+
 	/**
 	 * Always return <code>null</code>, no messages store a <code>Throwable</code> in this project.
 	 * @return 	always <code>null</code>
@@ -92,7 +92,7 @@ public abstract class SqlMessage
 	public Throwable getThrowable() {
 		return null;
 	}
-    
+
     /**
      * Break an SQL statement up into multiple lines in an attempt to make it
      * more readable.
@@ -184,7 +184,7 @@ public abstract class SqlMessage
 
     	return stringOutput;
     }
-    
+
     /**
      * Get debugging info - the module and line number that called the logger
      * version that prints the stack trace information from the point just before
@@ -237,7 +237,7 @@ public abstract class SqlMessage
     				className = stackTrace[i].getClassName();
     				if (className.startsWith("net.sf.log4jdbc")) {
     					firstLog4jdbcCall = i;
-    					
+
     				} else if (Properties.isTraceFromApplication() &&
     						Pattern.matches(Properties.getDebugStackPrefix(), className)) {
     					lastApplicationCall = i;
@@ -275,7 +275,7 @@ public abstract class SqlMessage
 	protected void setDebugEnabled(boolean isDebugEnabled) {
 		this.isDebugEnabled = isDebugEnabled;
 	}
-	
+
 	/**
 	 * @return the message
 	 */

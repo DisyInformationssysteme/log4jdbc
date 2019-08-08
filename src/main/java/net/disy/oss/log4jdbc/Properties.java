@@ -1,65 +1,65 @@
-package net.sf.log4jdbc;
+package net.disy.oss.log4jdbc;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.log.SpyLogFactory;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
+import net.disy.oss.log4jdbc.log.SpyLogFactory;
 
 
 /**
- * This class loads the properties for <code>log4jdbc-log4j2</code>. 
- * They are tried to be read first from a property file in the classpath 
+ * This class loads the properties for <code>log4jdbc-log4j2</code>.
+ * They are tried to be read first from a property file in the classpath
  * (called "log4jdbc.log4j2.properties"), then from the <code>System</code> properties.
  * <p>
- * This class has been copied from <code>net.sf.log4jdbc.DriverSpy</code> 
- * developed by Arthur Blake. ALl the properties that were loaded in this class 
- * are now loaded here. Differences as compared to this former implementation: 
+ * This class has been copied from <code>net.sf.log4jdbc.DriverSpy</code>
+ * developed by Arthur Blake. ALl the properties that were loaded in this class
+ * are now loaded here. Differences as compared to this former implementation:
  * <h3>Modifications for log4jdbc</h3>
  * <ul>
- * <li>Addition of public getters for the following attributes: <code>TrimSql</code>, 
- * <code>DumpSqlMaxLineLength</code>, <code>DumpSqlAddSemicolon</code>, 
- * <code>TrimExtraBlankLinesInSql</code>, <code>DumpFullDebugStackTrace</code>, 
- * <code>TraceFromApplication</code>, 
- * <code>DebugStackPrefix</code>, <code>DumpSqlFilteringOn</code>, 
- * <code>DumpSqlSelect</code>, <code>DumpSqlInsert</code>, <code>DumpSqlUpdate</code>, 
- * <code>DumpSqlCreate</code>, <code>DumpSqlDelete</code>, 
- * <code>SqlTimingErrorThresholdEnabled</code>, <code>SqlTimingErrorThresholdMsec</code>, 
- * <code>SqlTimingWarnThresholdEnabled</code>, <code>SqlTimingWarnThresholdMsec</code>, 
+ * <li>Addition of public getters for the following attributes: <code>TrimSql</code>,
+ * <code>DumpSqlMaxLineLength</code>, <code>DumpSqlAddSemicolon</code>,
+ * <code>TrimExtraBlankLinesInSql</code>, <code>DumpFullDebugStackTrace</code>,
+ * <code>TraceFromApplication</code>,
+ * <code>DebugStackPrefix</code>, <code>DumpSqlFilteringOn</code>,
+ * <code>DumpSqlSelect</code>, <code>DumpSqlInsert</code>, <code>DumpSqlUpdate</code>,
+ * <code>DumpSqlCreate</code>, <code>DumpSqlDelete</code>,
+ * <code>SqlTimingErrorThresholdEnabled</code>, <code>SqlTimingErrorThresholdMsec</code>,
+ * <code>SqlTimingWarnThresholdEnabled</code>, <code>SqlTimingWarnThresholdMsec</code>,
  * <code>AutoLoadPopularDrivers</code>.
- * <li>Addition of a new attribute, <code>SpyLogDelegatorName</code>, and the corresponding getter, 
- * <code>getSpyLogDelegatorName()</code>. 
- * Corresponds to the property "log4jdbc.spylogdelegator.name". 
+ * <li>Addition of a new attribute, <code>SpyLogDelegatorName</code>, and the corresponding getter,
+ * <code>getSpyLogDelegatorName()</code>.
+ * Corresponds to the property "log4jdbc.spylogdelegator.name".
  * Define the class implementing <code>SpyLogDelegator</code> to load.
- * Default is <code>net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator</code>. 
- * <code>net.sf.log4jdbc.SpyLogFactory</code> has been modified accordingly.  
- * <li><code>DebugStackPrefix</code> is now a <code>String</code> corresponding to a REGEX, 
- * not only to the beginning of the package name (this can obviously done using "^"). 
- * This is true only if log4j2 is used (see <code>SpyLogDelegatorName</code>), 
+ * Default is <code>net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator</code>.
+ * <code>net.sf.log4jdbc.SpyLogFactory</code> has been modified accordingly.
+ * <li><code>DebugStackPrefix</code> is now a <code>String</code> corresponding to a REGEX,
+ * not only to the beginning of the package name (this can obviously done using "^").
+ * This is true only if log4j2 is used (see <code>SpyLogDelegatorName</code>),
  * otherwise it has the standard behavior.
  * </ul>
- * 
+ *
  * @author Mathieu Seppey
  * @author Frederic Bastian
  * @author Arthur Blake
  * @version 0.1
  * @since 0.1
  */
-public final class Properties 
+public final class Properties
 {
 	private static volatile SpyLogDelegator log;
 
 	/**
-	 * A <code>String</code> representing the name of the class implementing 
-	 * <code>SpyLogDelegator</code> to use. It is used by {@link SpyLogFactory} 
-	 * to determine which class to load. 
-	 * Default is <code>net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator</code> 
-	 * 
+	 * A <code>String</code> representing the name of the class implementing
+	 * <code>SpyLogDelegator</code> to use. It is used by {@link SpyLogFactory}
+	 * to determine which class to load.
+	 * Default is <code>net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator</code>
+	 *
 	 * @see SpyLogFactory
 	 */
-	static final String SpyLogDelegatorName;	  
+	static final String SpyLogDelegatorName;
 
 	/**
 	 * Optional package prefix to use for finding application generating point of
@@ -159,7 +159,7 @@ public final class Properties
 	 */
 	static final boolean AutoLoadPopularDrivers;
 	/**
-	 * A <code>Collection</code> of <code>String</code>s listing the additional drivers 
+	 * A <code>Collection</code> of <code>String</code>s listing the additional drivers
 	 * to use beside the default drivers auto-loaded.
 	 */
 	static final Collection<String> AdditionalDrivers;
@@ -184,32 +184,32 @@ public final class Properties
 	 */
 	static final boolean SuppressGetGeneratedKeysException;
 
-	
+
 	/**
-	 * Static initializer. 
+	 * Static initializer.
 	 */
-	static 
+	static
 	{
         //first we init the logger
 		log = null;
-		
+
 		//then we need the properties to define which logger to use
 		java.util.Properties props = getProperties();
 		SpyLogDelegatorName = props.getProperty("log4jdbc.spylogdelegator.name");
-		
-		//now we set the logger ourselves 
-		//(as long as this class is not fully initialized, 
+
+		//now we set the logger ourselves
+		//(as long as this class is not fully initialized,
 		//SpyLogFactory cannot determine which logger to use)
 		SpyLogFactory.loadSpyLogDelegator(getSpyLogDelegatorName());
 		log = SpyLogFactory.getSpyLogDelegator();
-		
+
 		//now log some debug message
 		log.debug("log4jdbc-logj2 properties initialization...");
 		log.debug("Using logger: " + getSpyLogDelegatorName());
-		
+
 		//and now we set all the other properties, with proper logging messages
-		//here, this method should have been already called 
-		//by preLoggerIntialization(), but we use it again here so that we can log 
+		//here, this method should have been already called
+		//by preLoggerIntialization(), but we use it again here so that we can log
 		//where the properties come from.
 		// look for additional driver specified in properties
 		DebugStackPrefix = getStringOption(props, "log4jdbc.debug.stack.prefix");
@@ -263,7 +263,7 @@ public final class Properties
 		// look for additional driver specified in properties
 		String moreDrivers = getStringOption(props, "log4jdbc.drivers");
 		AdditionalDrivers = new HashSet<String>();
-		
+
 		if (moreDrivers != null) {
 			String[] moreDriversArr = moreDrivers.split(",");
 			for (int i = 0; i < moreDriversArr.length; i++) {
@@ -280,18 +280,18 @@ public final class Properties
 				getBooleanOption(props, "log4jdbc.suppress.generated.keys.exception",
 						false);
 
-		
+
 		log.debug("log4jdbc-logj2 properties initialization done.");
-	}   
-	
+	}
+
 	/**
-	 * Get the <code>java.util.Properties</code> either from the System properties, 
+	 * Get the <code>java.util.Properties</code> either from the System properties,
 	 * or from a configuration file.
-	 * Events will be logged only if <code>#log</code> has already been set, 
-	 * and this method will not try to load it: 
-	 * this method can be called before the properties needed to know 
-	 * which <code>SpyLogDelegator</code> to use are loaded, 
-	 * and it would generate an error to try to load it. 
+	 * Events will be logged only if <code>#log</code> has already been set,
+	 * and this method will not try to load it:
+	 * this method can be called before the properties needed to know
+	 * which <code>SpyLogDelegator</code> to use are loaded,
+	 * and it would generate an error to try to load it.
 	 * @return 		The <code>java.util.Properties</code> to get log4jdbc properties from.
 	 */
 	private static java.util.Properties getProperties()
@@ -300,7 +300,7 @@ public final class Properties
     	//try to get the properties file.
     	//default name is log4jdbc.log4j2.properties
     	//check first if an alternative name has been provided in the System properties
-    	String propertyFile = props.getProperty("log4jdbc.log4j2.properties.file", 
+    	String propertyFile = props.getProperty("log4jdbc.log4j2.properties.file",
     			"/log4jdbc.log4j2.properties");
 		if (log != null) {
 		    log.debug("Trying to use properties file " + propertyFile);
@@ -311,7 +311,7 @@ public final class Properties
     			props.load(propStream);
     		} catch (IOException e) {
     			if (log != null) {
-    			    log.debug("Error when loading log4jdbc.log4j2.properties from classpath: " + 
+    			    log.debug("Error when loading log4jdbc.log4j2.properties from classpath: " +
     			        e.getMessage());
     			}
     		} finally {
@@ -319,7 +319,7 @@ public final class Properties
     				propStream.close();
     			} catch (IOException e) {
     				if (log != null) {
-    				    log.debug("Error when closing log4jdbc.log4j2.properties file" + 
+    				    log.debug("Error when closing log4jdbc.log4j2.properties file" +
     			            e.getMessage());
     				}
     			}
@@ -332,10 +332,10 @@ public final class Properties
     		    log.debug("log4jdbc.logj2.properties not found in classpath. Using System properties.");
     		}
     	}
-    	
+
     	return props;
 	}
-	
+
 	/**
 	 * Get a Long option from a property and
 	 * log a debug message about this.
@@ -457,14 +457,14 @@ public final class Properties
 			val = defaultValue;
 		} else {
 			val= "true".equals(propValue) ||
-				 "yes".equals(propValue) || 
+				 "yes".equals(propValue) ||
 				 "on".equals(propValue);
 		}
 		log.debug("  " + propName + " = " + val);
 		return val;
 	}
-	
-	
+
+
 
 	/**
 	 * @return the SpyLogDelegatorName
@@ -472,10 +472,10 @@ public final class Properties
 	 */
 	public static String getSpyLogDelegatorName() {
 		return SpyLogDelegatorName;
-	}    
-	
+	}
 
-	  
+
+
 	  public static boolean isSqlTrim()
 	  {
 		  return TrimSql;
@@ -486,49 +486,49 @@ public final class Properties
 	  public static int getDumpSqlMaxLineLength() {
 	    return DumpSqlMaxLineLength;
 	  }
-	  
+
 	  /**
 	   * @return the dumpSqlAddSemicolon
 	   */
 	  public static boolean isDumpSqlAddSemicolon() {
 	  	return DumpSqlAddSemicolon;
 	  }
-	  
+
 	  /**
 	   * @return the trimExtraBlankLinesInSql
 	   */
 	  public static boolean isTrimExtraBlankLinesInSql() {
 	  	return TrimExtraBlankLinesInSql;
 	  }
-	  
+
 	  /**
 	   * @return the dumpFullDebugStackTrace
 	   */
 	  public static boolean isDumpFullDebugStackTrace() {
 	  	return DumpFullDebugStackTrace;
 	  }
-	  
+
 	  /**
 	   * @return the traceFromApplication
 	   */
 	  public static boolean isTraceFromApplication() {
 	  	return TraceFromApplication;
 	  }
-	  
+
 	  /**
 	   * @return the debugStackPrefix
 	   */
 	  public static String getDebugStackPrefix() {
 	  	return DebugStackPrefix;
 	  }
-	  
+
 	  /**
 	   * @return the dumpSqlFilteringOn
 	   */
 	  public static boolean isDumpSqlFilteringOn() {
 	  	return DumpSqlFilteringOn;
 	  }
-	  
+
 	  /**
 	   * @return the dumpSqlSelect
 	   */
@@ -559,7 +559,7 @@ public final class Properties
 	  public static boolean isDumpSqlCreate() {
 	  	return DumpSqlCreate;
 	  }
-	  
+
 	  /**
 	   * @return the sqlTimingErrorThresholdEnabled
 	   */
@@ -572,7 +572,7 @@ public final class Properties
 	  public static long getSqlTimingErrorThresholdMsec() {
 	  	return SqlTimingErrorThresholdMsec;
 	  }
-	  
+
 	  /**
 	   * @return the sqlTimingWarnThresholdEnabled
 	   */
@@ -599,7 +599,7 @@ public final class Properties
 	  public static Collection<String> getAdditionalDrivers() {
 		  return AdditionalDrivers;
 	  }
-	  
+
 	  /**
 	   * @return the DumpBooleanAsTrueFalse
 	   * @see #DumpBooleanAsTrueFalse
@@ -607,7 +607,7 @@ public final class Properties
 	  public static boolean isDumpBooleanAsTrueFalse() {
 		  return DumpBooleanAsTrueFalse;
 	  }
-	  
+
 	  /**
 	   * @return the StatementUsageWarn
 	   * @see #StatementUsageWarn
@@ -615,7 +615,7 @@ public final class Properties
 	  public static boolean isStatementUsageWarn() {
 		  return StatementUsageWarn;
 	  }
-	  
+
 	  /**
 	   * @return the SuppressGetGeneratedKeysException
 	   * @see #SuppressGetGeneratedKeysException

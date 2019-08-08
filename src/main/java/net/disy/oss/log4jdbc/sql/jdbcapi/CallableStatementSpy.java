@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -37,8 +37,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a CallableStatement and reports method calls, returns and exceptions.
@@ -74,11 +74,11 @@ public class CallableStatementSpy extends PreparedStatementSpy implements Callab
 	 * @param sql                   The SQL used for this CallableStatement
 	 * @param connectionSpy         The ConnectionSpy which produced this CallableStatementSpy
 	 * @param realCallableStatement The real CallableStatement that is being spied upon
-     * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-     * 						this <code>CallableStatementSpy</code> and all resources obtained 
+     * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+     * 						this <code>CallableStatementSpy</code> and all resources obtained
      * 						from it (<code>ResultSet</code>s)
 	 */
-	public CallableStatementSpy(String sql, ConnectionSpy connectionSpy, 
+	public CallableStatementSpy(String sql, ConnectionSpy connectionSpy,
 			CallableStatement realCallableStatement, SpyLogDelegator logDelegator)
 	{
 		super(sql, connectionSpy, realCallableStatement, logDelegator);
@@ -1794,7 +1794,7 @@ public class CallableStatementSpy extends PreparedStatementSpy implements Callab
 			//because the super classes would be invoked, thus executing their logging methods too...
 			return (T)reportReturn(methodCall,
 					(iface != null && (iface == CallableStatement.class||iface==PreparedStatement.class||
-					iface==Statement.class||iface==Spy.class))?
+					iface==Statement.class||iface== Spy.class))?
 							(T)this:
 								realCallableStatement.unwrap(iface));
 		}

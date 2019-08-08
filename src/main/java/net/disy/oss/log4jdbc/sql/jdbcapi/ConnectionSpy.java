@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.sql.Array;
 import java.sql.CallableStatement;
@@ -38,9 +38,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a JDBC Connection and reports method calls, returns and exceptions.
@@ -49,15 +49,15 @@ import net.sf.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
  * <p>
  * <h3>Modifications for log4j2: </h3>
  * <ul>
- * <li>Addition of new constructors, to accept a parameter <code>execTime</code>, 
- * a <code>long</code> defining the time elapsed to open the connection in ms. 
- * (see <code>SpyLogDelegator#connectionOpened(Spy, long)</code> for more details, 
+ * <li>Addition of new constructors, to accept a parameter <code>execTime</code>,
+ * a <code>long</code> defining the time elapsed to open the connection in ms.
+ * (see <code>SpyLogDelegator#connectionOpened(Spy, long)</code> for more details,
  * and modifications in <code>DriverSpy#connect(String, Properties)</code>).
- * <li>Modification of the method <code>close()</code> in order to compute 
- * execution time to close the connection (see <code>SpyLogDelegator#connectionClosed(Spy, long), 
+ * <li>Modification of the method <code>close()</code> in order to compute
+ * execution time to close the connection (see <code>SpyLogDelegator#connectionClosed(Spy, long),
  * or before an <code>Exception</code> is thrown if a problem occurs. </code>)
- * <li>Addition of a new method <code>ConnectionSpy#reportException(String, SQLException, long)</code> 
- * to log execution time before an <code>Exception</code> is thrown when the connection closing failed. 
+ * <li>Addition of a new method <code>ConnectionSpy#reportException(String, SQLException, long)</code>
+ * to log execution time before an <code>Exception</code> is thrown when the connection closing failed.
  * </ul>
  *
  * @author Arthur Blake
@@ -87,7 +87,7 @@ public class ConnectionSpy implements Connection, Spy
    * Contains a Mapping of connectionNumber to currently open ConnectionSpy
    * objects.
    */
-  private static final Map<Integer, ConnectionSpy> connectionTracker = 
+  private static final Map<Integer, ConnectionSpy> connectionTracker =
 		  new HashMap<Integer, ConnectionSpy>();
 
   /**
@@ -131,8 +131,8 @@ public class ConnectionSpy implements Connection, Spy
    * Create a new ConnectionSpy that wraps a given Connection.
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-   * 						this <code>ConnectionSpy</code> and all resources obtained from it 
+   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
   public ConnectionSpy(Connection realConnection, SpyLogDelegator logDelegator)
@@ -144,10 +144,10 @@ public class ConnectionSpy implements Connection, Spy
    * Create a new ConnectionSpy that wraps a given Connection.
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
-   * @param execTime 	a <code>long</code> defining the time in ms 
-   * 					taken to open the connection to <code>realConnection</code>. 
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-   * 						this <code>ConnectionSpy</code> and all resources obtained from it 
+   * @param execTime 	a <code>long</code> defining the time in ms
+   * 					taken to open the connection to <code>realConnection</code>.
+   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
   public ConnectionSpy(Connection realConnection, long execTime, SpyLogDelegator logDelegator)
@@ -160,11 +160,11 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
    * @param rdbmsSpecifics the RdbmsSpecifics object for formatting logging appropriate for the Rdbms used.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-   * 						this <code>ConnectionSpy</code> and all resources obtained from it 
+   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
-  public ConnectionSpy(Connection realConnection, RdbmsSpecifics rdbmsSpecifics, 
+  public ConnectionSpy(Connection realConnection, RdbmsSpecifics rdbmsSpecifics,
 		  SpyLogDelegator logDelegator)
   {
     this(realConnection, rdbmsSpecifics, -1L, logDelegator);
@@ -175,14 +175,14 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
    * @param rdbmsSpecifics the RdbmsSpecifics object for formatting logging appropriate for the Rdbms used.
-   * @param execTime 	a <code>long</code> defining the time in ms 
-   * 					taken to open the connection to <code>realConnection</code>. 
-   * 					Should be equals to -1 if not used. 
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-   * 						this <code>ConnectionSpy</code> and all resources obtained from it 
+   * @param execTime 	a <code>long</code> defining the time in ms
+   * 					taken to open the connection to <code>realConnection</code>.
+   * 					Should be equals to -1 if not used.
+   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
-  public ConnectionSpy(Connection realConnection, RdbmsSpecifics rdbmsSpecifics, 
+  public ConnectionSpy(Connection realConnection, RdbmsSpecifics rdbmsSpecifics,
 		  long execTime, SpyLogDelegator logDelegator)
   {
     if (rdbmsSpecifics == null)
@@ -280,16 +280,16 @@ public class ConnectionSpy implements Connection, Spy
   {
     reportAllReturns(methodCall, "");
   }
-  
+
   private void reportClosed(long execTime)
   {
     log.connectionClosed(this, execTime);
-  }  
-  
+  }
+
   private void reportAborted(long execTime)
   {
     log.connectionAborted(this, execTime);
-  }     
+  }
 
   // forwarding methods
 
@@ -1070,59 +1070,59 @@ public class ConnectionSpy implements Connection, Spy
 		String methodCall = "setSchema(" + schema + ")";
 		try
 		{
-			realConnection.setSchema(schema);	
+			realConnection.setSchema(schema);
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;			
+			throw s;
 		}
 	}
-	
-  @Override	
+
+  @Override
 	public String getSchema() throws SQLException
 	{
 		String methodCall = "getSchema()";
 		try
 		{
-			return reportReturn(methodCall,realConnection.getSchema());	
+			return reportReturn(methodCall,realConnection.getSchema());
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;			
+			throw s;
 		}
 	}
-	
-  @Override	
+
+  @Override
 	public void abort(Executor executor) throws SQLException
 	{
 		String methodCall = "abort(" + executor + ")";
 		long tstart = System.currentTimeMillis();
 		try
 		{
-			realConnection.abort(executor);	
+			realConnection.abort(executor);
 			reportAborted(System.currentTimeMillis() - tstart);
 		}
 		catch (SQLException s)
 		{
 		    reportException(methodCall, s, System.currentTimeMillis() - tstart);
-			throw s;			
+			throw s;
 		}
 	}
 
-  @Override	
+  @Override
 	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException
 	{
 		String methodCall = "setNetworkTimeout(" + executor + ", " + milliseconds + ";";
 		try
 		{
-			realConnection.setNetworkTimeout(executor,milliseconds);	
+			realConnection.setNetworkTimeout(executor,milliseconds);
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;			
+			throw s;
 		}
 	}
 
@@ -1131,12 +1131,12 @@ public class ConnectionSpy implements Connection, Spy
 		String methodCall = "getNetworkTimeout()";
 		try
 		{
-			return reportReturn(methodCall, realConnection.getNetworkTimeout());	
+			return reportReturn(methodCall, realConnection.getNetworkTimeout());
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;			
+			throw s;
 		}
 	}
 }

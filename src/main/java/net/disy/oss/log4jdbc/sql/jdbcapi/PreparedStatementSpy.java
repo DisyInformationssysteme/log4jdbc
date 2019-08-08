@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -39,16 +39,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a PreparedStatement and reports method calls, returns and exceptions.
  * <p>
- * MODIFICATIONS FOR LOG4J2: 
- * This class now overrides <code>Statement.getGeneratedKeys()</code> 
- * in order to use the convenient method <code>Statement.getGeneratedKeys(String)</code>, 
+ * MODIFICATIONS FOR LOG4J2:
+ * This class now overrides <code>Statement.getGeneratedKeys()</code>
+ * in order to use the convenient method <code>Statement.getGeneratedKeys(String)</code>,
  * by providing the String returned by <code>dumpedSql()</code>.
  *
  * @author Arthur Blake
@@ -185,11 +185,11 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
    * @param sql                   SQL for the prepared statement that is being spied upon.
    * @param connectionSpy         ConnectionSpy that was called to produce this PreparedStatement.
    * @param realPreparedStatement The actual PreparedStatement that is being spied upon.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-   * 						this <code>PreparedStatementSpy</code> and all resources obtained 
+   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * 						this <code>PreparedStatementSpy</code> and all resources obtained
    * 						from it (<code>ResultSet</code>s)
    */
-  public PreparedStatementSpy(String sql, ConnectionSpy connectionSpy, 
+  public PreparedStatementSpy(String sql, ConnectionSpy connectionSpy,
 		  PreparedStatement realPreparedStatement, SpyLogDelegator logDelegator)
   {
     super(connectionSpy, realPreparedStatement, logDelegator);  // does null check for us
@@ -328,7 +328,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setBlob(int i, Blob x) throws SQLException
   {
     String methodCall = "setBlob(" + i + ", " + x + ")";
-    argTraceSet(i, "(Blob)", 
+    argTraceSet(i, "(Blob)",
       x==null?null:("<Blob of size " + x.length() + ">"));
     try
     {
@@ -1191,7 +1191,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
       //NOTE: could call super.isWrapperFor to simplify this logic, but it would result in extra log output
       //because the super classes would be invoked, thus executing their logging methods too...
       return (T)reportReturn(methodCall,
-        (iface != null && (iface==PreparedStatement.class||iface==Statement.class||iface==Spy.class))?
+        (iface != null && (iface==PreparedStatement.class||iface==Statement.class||iface== Spy.class))?
           (T)this:
           realPreparedStatement.unwrap(iface));
     }

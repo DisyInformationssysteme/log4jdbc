@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -25,11 +25,10 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.ArrayList;
 
-import net.sf.log4jdbc.Properties;
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.Utilities;
-
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.Utilities;
+import net.disy.oss.log4jdbc.Properties;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a Statement and reports method calls, returns and exceptions.
@@ -38,14 +37,14 @@ import net.sf.log4jdbc.sql.Utilities;
  * <p>
  * MODIFICATIONS FOR LOG4J2:
  * <ul>
- * <li>The <code>sql</code> attribute of the class <code>PreparedStatementSpy</code> 
- * have been moved here, so that we can know on which query 
- * a <code>getGeneratedKeys()</code> is performed. It is useful in case of 
+ * <li>The <code>sql</code> attribute of the class <code>PreparedStatementSpy</code>
+ * have been moved here, so that we can know on which query
+ * a <code>getGeneratedKeys()</code> is performed. It is useful in case of
  * interleaved queries using different connections.
  * <li>All the <code>execute...</code> methods now set this <code>sql</code> attribute.
- * <li>A new convenient method has been added, <code>getGeneratedKeys(String)</code>, 
- * which allows to launch a <code>reportSqlTiming(long, String, String)</code>. 
- * <li><code>getGeneratedKeys()</code> now delegates to this method <code>getGeneratedKeys(String)</code>, 
+ * <li>A new convenient method has been added, <code>getGeneratedKeys(String)</code>,
+ * which allows to launch a <code>reportSqlTiming(long, String, String)</code>.
+ * <li><code>getGeneratedKeys()</code> now delegates to this method <code>getGeneratedKeys(String)</code>,
  * by providing the <code>sql</code> attribute.
  * </ul>
  *
@@ -68,7 +67,7 @@ public class StatementSpy implements Statement, Spy
 	protected Statement realStatement;
 
 	/**
-	 * The SQL query. 
+	 * The SQL query.
 	 */
 	protected String sql;
 
@@ -88,11 +87,11 @@ public class StatementSpy implements Statement, Spy
 	 *
 	 * @param connectionSpy Connection that created this Statement.
 	 * @param realStatement real underlying Statement that this StatementSpy wraps.
-     * @param logDelegator 	The <code>SpyLogDelegator</code> used by 
-     * 						this <code>StatementSpy</code> and all resources obtained from it 
+     * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+     * 						this <code>StatementSpy</code> and all resources obtained from it
      * 						(<code>ResultSet</code>s)
 	 */
-	public StatementSpy(ConnectionSpy connectionSpy, Statement realStatement, 
+	public StatementSpy(ConnectionSpy connectionSpy, Statement realStatement,
 			SpyLogDelegator logDelegator)
 	{
 		if (realStatement == null)
@@ -625,7 +624,7 @@ public class StatementSpy implements Statement, Spy
 	}
 
 	/**
-	 * Convenient method to get generated keys and logging 
+	 * Convenient method to get generated keys and logging
 	 * the SQL query on which this operation is performed.
 	 * @param sql 	the SQL query
 	 * @return 		the ResultSet to get the generated keys
@@ -1114,27 +1113,27 @@ public class StatementSpy implements Statement, Spy
 		String methodCall = "closeOnCompletion()";
 		try
 		{
-			realStatement.closeOnCompletion();  
+			realStatement.closeOnCompletion();
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall, s);
-			throw s;      
-		} 
+			throw s;
+		}
 	}
 
 	@Override
 	public boolean isCloseOnCompletion() throws SQLException
 	{
-		String methodCall = "isCloseOnCompletion()";  
+		String methodCall = "isCloseOnCompletion()";
 		try
 		{
-			return reportReturn(methodCall,realStatement.isCloseOnCompletion());  
+			return reportReturn(methodCall,realStatement.isCloseOnCompletion());
 		}
 		catch (SQLException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
+			throw s;
 		}
 	}
 

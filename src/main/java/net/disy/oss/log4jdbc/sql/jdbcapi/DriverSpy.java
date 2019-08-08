@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.log4jdbc.sql.jdbcapi;
+package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -30,15 +30,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import net.sf.log4jdbc.Properties;
-import net.sf.log4jdbc.log.SpyLogDelegator;
-import net.sf.log4jdbc.log.SpyLogFactory;
-import net.sf.log4jdbc.sql.Spy;
-import net.sf.log4jdbc.sql.rdbmsspecifics.MySqlRdbmsSpecifics;
-import net.sf.log4jdbc.sql.rdbmsspecifics.OracleRdbmsSpecifics;
-import net.sf.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
-import net.sf.log4jdbc.sql.rdbmsspecifics.SqlServerRdbmsSpecifics;
-
+import net.disy.oss.log4jdbc.sql.Spy;
+import net.disy.oss.log4jdbc.sql.rdbmsspecifics.MySqlRdbmsSpecifics;
+import net.disy.oss.log4jdbc.sql.rdbmsspecifics.OracleRdbmsSpecifics;
+import net.disy.oss.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
+import net.disy.oss.log4jdbc.sql.rdbmsspecifics.SqlServerRdbmsSpecifics;
+import net.disy.oss.log4jdbc.Properties;
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
+import net.disy.oss.log4jdbc.log.SpyLogFactory;
 
 /**
  * A JDBC driver which is a facade that delegates to one or more real underlying
@@ -96,13 +95,13 @@ import net.sf.log4jdbc.sql.rdbmsspecifics.SqlServerRdbmsSpecifics;
  * time.  This will not usually be a problem, since the driver is retrieved by
  * it's URL from the DriverManager in the first place (thus establishing an
  * underlying real driver), and in most applications their is only one database.
- * 
+ *
  * <h3>Modifications for log4j2: </h3>
  * <ul>
- * <li>The initialization of all properties have been delegated to the class 
+ * <li>The initialization of all properties have been delegated to the class
  * {@link net.sf.log4jdbc.log4j2.Properties}.
- * <li>Modification of the method <code>connect(String, Properties)</code> 
- * in order to compute the time taken to open a connection to the database. 
+ * <li>Modification of the method <code>connect(String, Properties)</code>
+ * in order to compute the time taken to open a connection to the database.
  * Constructors of <code>ConnectionSpy</code> have been modified accordingly.
  * </ul>
  *
@@ -129,14 +128,14 @@ public class DriverSpy implements Driver
 	static final RdbmsSpecifics defaultRdbmsSpecifics = new RdbmsSpecifics();
 
 	/**
-	 * A <code>SpyLogDelegator</code> used here for logs internal to log4jdbc 
+	 * A <code>SpyLogDelegator</code> used here for logs internal to log4jdbc
 	 * (see <code>debug(String)</code> method of <code>SpyLogDelegator</code>).
 	 */
 	static final SpyLogDelegator log = SpyLogFactory.getSpyLogDelegator();
-	
+
 	/**
-	 * A <code>String</code> representing the prefix of URL 
-	 * to use log4jdbc. 
+	 * A <code>String</code> representing the prefix of URL
+	 * to use log4jdbc.
 	 */
 	static final private String log4jdbcUrlPrefix = "jdbc:log4";
 
@@ -145,7 +144,7 @@ public class DriverSpy implements Driver
 	 */
 	public DriverSpy()
 	{
-		
+
 	}
 
 	/**
@@ -154,7 +153,7 @@ public class DriverSpy implements Driver
 	static
 	{
 		log.debug("DriverSpy intialization...");
-		
+
 		// The Set of drivers that the log4jdbc driver will preload at instantiation
 		// time.  The driver can spy on any driver type, it's just a little bit
 		// easier to configure log4jdbc if it's one of these types!
@@ -251,7 +250,7 @@ public class DriverSpy implements Driver
 
 		if (r == null) {
 			return defaultRdbmsSpecifics;
-		} 
+		}
 		return r;
 	}
 
@@ -267,7 +266,7 @@ public class DriverSpy implements Driver
 	{
 		if (lastUnderlyingDriverRequested == null) {
 			return 1;
-		} 
+		}
 		return lastUnderlyingDriverRequested.getMajorVersion();
 	}
 
@@ -353,14 +352,14 @@ public class DriverSpy implements Driver
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Get the actual URL that the real driver expects 
+	 * Get the actual URL that the real driver expects
 	 * (strip off <code>#log4jdbcUrlPrefix</code> from <code>url</code>).
-	 * 
-	 * @param url 	A <code>String</code> corresponding to a JDBC url for log4jdbc. 
-	 * @return 		A <code>String</code> representing url 
-	 * 				with <code>#log4jdbcUrlPrefix</code> stripped off. 
+	 *
+	 * @param url 	A <code>String</code> corresponding to a JDBC url for log4jdbc.
+	 * @return 		A <code>String</code> representing url
+	 * 				with <code>#log4jdbcUrlPrefix</code> stripped off.
 	 */
 	private String getRealUrl(String url)
 	{
@@ -452,7 +451,7 @@ public class DriverSpy implements Driver
 	protected void reportException(String methodCall, SQLException exception)
 	{
 		log.exceptionOccured((Spy) this, methodCall, exception, null, -1L);
-	}  
+	}
 
 	@Override
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException
@@ -460,12 +459,12 @@ public class DriverSpy implements Driver
 		String methodCall = "getParentLogger()";
 		try
 		{
-			return lastUnderlyingDriverRequested.getParentLogger();  
+			return lastUnderlyingDriverRequested.getParentLogger();
 		}
 		catch (SQLFeatureNotSupportedException s)
 		{
 			reportException(methodCall,s);
-			throw s;      
+			throw s;
 		}
 	}
 }
