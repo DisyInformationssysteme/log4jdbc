@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>org.bgee.log4jdbc-log4j2</groupId>
+    <artifactId>log4jdbc-log4j2</artifactId>
+    <version>1.16</version>
+  </parent>
+  
+  <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
+  <packaging>jar</packaging>
+  <name>log4jdbc-log4j2-jdbc4.1</name>
+  
+  <dependencies>
+  
+  </dependencies>
+
+  <!-- in order to compile with JDK 1.7 -->
+  <build>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.1</version>
+              <configuration>
+                  <!-- 
+                  Here we assume that the default JDK version on the machine compiling the project 
+                  is 1.7. Otherwise, you need to provide the path to the JDK 1.7 
+                  (see for instance the pom.xml in log4jdbc-log4j2-jdbc4, using a JDK 1.6)
+                  -->
+                  <source>1.7</source>
+                  <target>1.7</target>
+              </configuration>
+          </plugin>
+      </plugins>
+      <finalName>log4jdbc-log4j2-jdbc4.1-${project.version}</finalName>
+  </build>  
+  
+</project>
