@@ -114,13 +114,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
 
   protected String dumpedSql()
   {
-    StringBuffer dumpSql = new StringBuffer();
+    StringBuilder dumpSql = new StringBuilder();
     int lastPos = 0;
-    int Qpos = sql.indexOf('?', lastPos);  // find position of first question mark
+    int qPos = sql.indexOf('?', lastPos);  // find position of first question mark
     int argIdx = 0;
     String arg;
 
-    while (Qpos != -1)
+    while (qPos != -1)
     {
       // get stored argument
       synchronized (argTrace)
@@ -141,9 +141,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
 
       argIdx++;
 
-      dumpSql.append(sql.substring(lastPos, Qpos));  // dump segment of sql up to question mark.
-      lastPos = Qpos + 1;
-      Qpos = sql.indexOf('?', lastPos);
+      dumpSql.append(sql.substring(lastPos, qPos));  // dump segment of sql up to question mark.
+      lastPos = qPos + 1;
+      qPos = sql.indexOf('?', lastPos);
       dumpSql.append(arg);
     }
     if (lastPos < sql.length())
@@ -381,7 +381,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setByte(int parameterIndex, byte x) throws SQLException
   {
     String methodCall = "setByte(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(byte)", new Byte(x));
+    argTraceSet(parameterIndex, "(byte)", x);
     try
     {
       realPreparedStatement.setByte(parameterIndex, x);
@@ -418,7 +418,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setShort(int parameterIndex, short x) throws SQLException
   {
     String methodCall = "setShort(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(short)", new Short(x));
+    argTraceSet(parameterIndex, "(short)", x);
     try
     {
       realPreparedStatement.setShort(parameterIndex, x);
@@ -455,7 +455,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setInt(int parameterIndex, int x) throws SQLException
   {
     String methodCall = "setInt(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(int)", new Integer(x));
+    argTraceSet(parameterIndex, "(int)", x);
     try
     {
       realPreparedStatement.setInt(parameterIndex, x);
@@ -472,7 +472,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setLong(int parameterIndex, long x) throws SQLException
   {
     String methodCall = "setLong(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(long)", new Long(x));
+    argTraceSet(parameterIndex, "(long)", x);
     try
     {
       realPreparedStatement.setLong(parameterIndex, x);
@@ -489,7 +489,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setFloat(int parameterIndex, float x) throws SQLException
   {
     String methodCall = "setFloat(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(float)", new Float(x));
+    argTraceSet(parameterIndex, "(float)", x);
     try
     {
       realPreparedStatement.setFloat(parameterIndex, x);
@@ -506,7 +506,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setDouble(int parameterIndex, double x) throws SQLException
   {
     String methodCall = "setDouble(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(double)", new Double(x));
+    argTraceSet(parameterIndex, "(double)", x);
     try
     {
       realPreparedStatement.setDouble(parameterIndex, x);

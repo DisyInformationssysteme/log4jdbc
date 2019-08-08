@@ -99,7 +99,7 @@ import net.disy.oss.log4jdbc.log.SpyLogFactory;
  * <h3>Modifications for log4j2: </h3>
  * <ul>
  * <li>The initialization of all properties have been delegated to the class
- * {@link net.sf.log4jdbc.log4j2.Properties}.
+ * {@link Properties}.
  * <li>Modification of the method <code>connect(String, Properties)</code>
  * in order to compute the time taken to open a connection to the database.
  * Constructors of <code>ConnectionSpy</code> have been modified accordingly.
@@ -147,11 +147,7 @@ public class DriverSpy implements Driver
 
 	}
 
-	/**
-	 * Static initializer.
-	 */
-	static
-	{
+	static {
 		log.debug("DriverSpy intialization...");
 
 		// The Set of drivers that the log4jdbc driver will preload at instantiation
@@ -189,8 +185,7 @@ public class DriverSpy implements Driver
 		} catch (SQLException s) {
 			// this exception should never be thrown, JDBC just defines it
 			// for completeness
-			throw (RuntimeException) new RuntimeException
-			("could not register log4jdbc driver!").initCause(s);
+			throw new RuntimeException("could not register log4jdbc driver!", s);
 		}
 
 		// instantiate all the supported drivers and remove
@@ -206,7 +201,7 @@ public class DriverSpy implements Driver
 			}
 		}
 
-		if (subDrivers.size() == 0) {
+		if (subDrivers.isEmpty()) {
 			log.debug("WARNING!  " +
 					"log4jdbc couldn't find any underlying jdbc drivers.");
 		}
@@ -215,7 +210,7 @@ public class DriverSpy implements Driver
 		OracleRdbmsSpecifics oracle = new OracleRdbmsSpecifics();
 		MySqlRdbmsSpecifics mySql = new MySqlRdbmsSpecifics();
 
-		/** create lookup Map for specific rdbms formatters */
+		/* create lookup Map for specific rdbms formatters */
 		rdbmsSpecifics = new HashMap<String, RdbmsSpecifics>();
 		rdbmsSpecifics.put("oracle.jdbc.driver.OracleDriver", oracle);
 		rdbmsSpecifics.put("oracle.jdbc.OracleDriver", oracle);

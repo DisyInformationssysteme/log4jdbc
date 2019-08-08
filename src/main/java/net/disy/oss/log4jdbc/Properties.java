@@ -184,12 +184,7 @@ public final class Properties
 	 */
 	static final boolean SuppressGetGeneratedKeysException;
 
-
-	/**
-	 * Static initializer.
-	 */
-	static
-	{
+	static {
         //first we init the logger
 		log = null;
 
@@ -217,21 +212,19 @@ public final class Properties
 
 		Long thresh = getLongOption(props, "log4jdbc.sqltiming.warn.threshold");
 		SqlTimingWarnThresholdEnabled = (thresh != null);
-		long SqlTimingWarnThresholdMsecTemp = -1;
-		if (SqlTimingWarnThresholdEnabled)
-		{
-			SqlTimingWarnThresholdMsecTemp = thresh.longValue();
+		long sqlTimingWarnThresholdMsec = -1;
+		if (SqlTimingWarnThresholdEnabled) {
+			sqlTimingWarnThresholdMsec = thresh;
 		}
-		SqlTimingWarnThresholdMsec = SqlTimingWarnThresholdMsecTemp;
+		SqlTimingWarnThresholdMsec = sqlTimingWarnThresholdMsec;
 
 		thresh = getLongOption(props, "log4jdbc.sqltiming.error.threshold");
 		SqlTimingErrorThresholdEnabled = (thresh != null);
-		long SqlTimingErrorThresholdMsecTemp = -1;
-		if (SqlTimingErrorThresholdEnabled)
-		{
-			SqlTimingErrorThresholdMsecTemp = thresh.longValue();
+		long sqlTimingErrorThresholdMsec = -1;
+		if (SqlTimingErrorThresholdEnabled) {
+			sqlTimingErrorThresholdMsec = thresh;
 		}
-		SqlTimingErrorThresholdMsec = SqlTimingErrorThresholdMsecTemp;
+		SqlTimingErrorThresholdMsec = sqlTimingErrorThresholdMsec;
 
 		DumpBooleanAsTrueFalse =
 				getBooleanOption(props, "log4jdbc.dump.booleanastruefalse",false);
@@ -266,9 +259,9 @@ public final class Properties
 
 		if (moreDrivers != null) {
 			String[] moreDriversArr = moreDrivers.split(",");
-			for (int i = 0; i < moreDriversArr.length; i++) {
-				AdditionalDrivers.add(moreDriversArr[i]);
-				log.debug ("    will look for specific driver " + moreDriversArr[i]);
+			for (String s : moreDriversArr) {
+				AdditionalDrivers.add(s);
+				log.debug("    will look for specific driver " + s);
 			}
 		}
 
@@ -358,7 +351,7 @@ public final class Properties
 		{
 			try
 			{
-				longPropValue = new Long(Long.parseLong(propValue));
+				longPropValue = Long.parseLong(propValue);
 				log.debug("  " + propName + " = " + longPropValue);
 			}
 			catch (NumberFormatException n)
@@ -380,8 +373,7 @@ public final class Properties
 	 * @return the value of that property key, converted
 	 * to a Long.  Or null if not defined or is invalid.
 	 */
-	private static Long getLongOption(java.util.Properties props, String propName,
-			long defaultValue)
+	private static Long getLongOption(java.util.Properties props, String propName, long defaultValue)
 	{
 		String propValue = props.getProperty(propName);
 		Long longPropValue;
@@ -389,20 +381,20 @@ public final class Properties
 		{
 			log.debug("x " + propName + " is not defined (using default of " +
 					defaultValue +")");
-			longPropValue = new Long(defaultValue);
+			longPropValue = defaultValue;
 		}
 		else
 		{
 			try
 			{
-				longPropValue = new Long(Long.parseLong(propValue));
+				longPropValue = Long.parseLong(propValue);
 				log.debug("  " + propName + " = " + longPropValue);
 			}
 			catch (NumberFormatException n)
 			{
 				log.debug("x " + propName + " \"" + propValue  +
 						"\" is not a valid number (using default of " + defaultValue +")");
-				longPropValue = new Long(defaultValue);
+				longPropValue = defaultValue;
 			}
 		}
 		return longPropValue;

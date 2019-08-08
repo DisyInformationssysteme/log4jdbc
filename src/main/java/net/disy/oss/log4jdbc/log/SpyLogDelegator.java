@@ -165,7 +165,7 @@ public interface SpyLogDelegator
      * return <code>false</code> meaning that its end is reached.
      * It will be also called if the <code>ResultSet</code> is closed.
      *
-     * @see net.sf.log4jdbc.ResultSetSpy
+     * @see net.disy.oss.log4jdbc.sql.jdbcapi.ResultSetSpy
      * @see net.disy.oss.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector
 
      */

@@ -98,7 +98,7 @@ public class ConnectionSpy implements Connection, Spy
    */
   public static String getOpenConnectionsDump()
   {
-    StringBuffer dump = new StringBuffer();
+    StringBuilder dump = new StringBuilder();
     int size;
     Integer[] keysArr;
     synchronized (connectionTracker)
@@ -109,7 +109,7 @@ public class ConnectionSpy implements Connection, Spy
         return "open connections:  none";
       }
       Set<Integer> keys = connectionTracker.keySet();
-      keysArr = keys.toArray(new Integer[keys.size()]);
+      keysArr = keys.toArray(Integer[]::new);
     }
 
     Arrays.sort(keysArr);
@@ -199,7 +199,7 @@ public class ConnectionSpy implements Connection, Spy
 
     synchronized (connectionTracker)
     {
-      connectionNumber = new Integer(++lastConnectionNumber);
+      connectionNumber = ++lastConnectionNumber;
       connectionTracker.put(connectionNumber, this);
     }
     log.connectionOpened(this, execTime);

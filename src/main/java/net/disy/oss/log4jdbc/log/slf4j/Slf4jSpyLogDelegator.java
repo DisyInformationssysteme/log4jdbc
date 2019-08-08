@@ -396,7 +396,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
     private String buildSqlTimingDump(Spy spy, long execTime, String methodCall,
             String sql, boolean debugInfo)
     {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
         if (debugInfo)
         {
@@ -443,7 +443,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator
         {
             String className;
 
-            StringBuffer dump = new StringBuffer();
+            StringBuilder dump = new StringBuilder();
 
             /**
              * The DumpFullDebugStackTrace option is useful in some situations when

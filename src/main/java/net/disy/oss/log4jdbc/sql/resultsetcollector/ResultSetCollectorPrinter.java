@@ -56,7 +56,7 @@ public class ResultSetCollectorPrinter {
      * @param resultSetCollector the ResultSetCollector which has collected the data we want to print
      * @return A <code>String</code> which contains the formatted table to print
      *
-     * @see net.sf.log4jdbc.ResultSetSpy
+     * @see net.disy.oss.log4jdbc.sql.jdbcapi.ResultSetSpy
      * @see DefaultResultSetCollector
      * @see net.disy.oss.log4jdbc.log.SpyLogDelegator
      *
@@ -66,7 +66,7 @@ public class ResultSetCollectorPrinter {
         this.table.append(System.getProperty("line.separator"));
 
         int columnCount = resultSetCollector.getColumnCount();
-        int maxLength[] = new int[columnCount];
+        int[] maxLength = new int[columnCount];
 
         for (int column = 1; column <= columnCount; column++) {
             maxLength[column - 1] = resultSetCollector.getColumnName(column)
@@ -93,21 +93,23 @@ public class ResultSetCollectorPrinter {
         this.table.append("|");
 
         for (int column = 1; column <= columnCount; column++) {
-            this.table.append(padRight("-", maxLength[column - 1]).replaceAll(" ", "-")
-                    + "|");
+            this.table
+                .append(padRight("-", maxLength[column - 1]).replaceAll(" ", "-"))
+                .append("|");
         }
         this.table.append(System.getProperty("line.separator"));
         this.table.append("|");
         for (int column = 1; column <= columnCount; column++) {
-            this.table.append(padRight(resultSetCollector.getColumnName(column),
-                    maxLength[column - 1])
-                    + "|");
+            this.table
+                .append(padRight(resultSetCollector.getColumnName(column), maxLength[column - 1]))
+                .append("|");
         }
         this.table.append(System.getProperty("line.separator"));
         this.table.append("|");
         for (int column = 1; column <= columnCount; column++) {
-            this.table.append(padRight("-", maxLength[column - 1]).replaceAll(" ", "-")
-                    + "|");
+            this.table
+                .append(padRight("-", maxLength[column - 1]).replaceAll(" ", "-"))
+                .append("|");
         }
         this.table.append(System.getProperty("line.separator"));
         if (resultSetCollector.getRows() != null) {
@@ -115,9 +117,9 @@ public class ResultSetCollectorPrinter {
                 int colIndex = 0;
                 this.table.append("|");
                 for (Object v : printRow) {
-                    this.table.append(padRight(v == null ? "null" : v.toString(),
-                            maxLength[colIndex])
-                            + "|");
+                    this.table
+                        .append(padRight(v == null ? "null" : v.toString(), maxLength[colIndex]))
+                        .append("|");
                     colIndex++;
                 }
                 this.table.append(System.getProperty("line.separator"));
@@ -125,8 +127,9 @@ public class ResultSetCollectorPrinter {
         }
         this.table.append("|");
         for (int column = 1; column <= columnCount; column++) {
-            this.table.append(padRight("-", maxLength[column - 1]).replaceAll(" ", "-")
-                    + "|");
+            this.table
+                .append(padRight("-", maxLength[column - 1]).replaceAll(" ", "-"))
+                .append("|");
         }
 
         this.table.append(System.getProperty("line.separator"));

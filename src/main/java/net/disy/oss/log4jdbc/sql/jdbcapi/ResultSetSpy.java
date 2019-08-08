@@ -184,7 +184,7 @@ public class ResultSetSpy implements ResultSet, Spy
    * Conveniance method to report (for logging) that a method returned an Object.
    *
    * @param methodCall description of method call and arguments passed to it that returned.
-   * @param value return T.
+   * @param returnValue return T.
    * @return the return Object as passed in.
    */
   protected <T> T reportReturn(String methodCall, T returnValue, Object... args)
@@ -1928,8 +1928,7 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "getObject(" + columnIndex + ")";
     try
     {
-      return reportReturn(methodCall, realResultSet.getObject(columnIndex), new Object[]
-      { columnIndex });
+      return reportReturn(methodCall, realResultSet.getObject(columnIndex), columnIndex);
     }
     catch (SQLException s)
     {
@@ -1944,8 +1943,7 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "getObject(" + columnName + ")";
     try
     {
-      return reportReturn(methodCall, realResultSet.getObject(columnName), new Object[]
-      { columnName });
+      return reportReturn(methodCall, realResultSet.getObject(columnName), columnName);
     }
     catch (SQLException s)
     {
@@ -1960,8 +1958,7 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "getObject(" + colName + ", " + map + ")";
     try
     {
-      return reportReturn(methodCall, realResultSet.getObject(colName, map), new Object[]
-      { colName, map });
+      return reportReturn(methodCall, realResultSet.getObject(colName, map), colName, map);
     }
     catch (SQLException s)
     {
@@ -2100,8 +2097,7 @@ public class ResultSetSpy implements ResultSet, Spy
     String methodCall = "getObject(" + columnIndex + ", " + map + ")";
     try
     {
-      return reportReturn(methodCall, realResultSet.getObject(columnIndex, map), new Object[]
-      { columnIndex, map });
+      return reportReturn(methodCall, realResultSet.getObject(columnIndex, map), columnIndex, map);
     }
     catch (SQLException s)
     {

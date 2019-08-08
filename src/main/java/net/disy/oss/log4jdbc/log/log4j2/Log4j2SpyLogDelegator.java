@@ -81,10 +81,10 @@ import org.apache.logging.log4j.MarkerManager;
  * @author Mathieu Seppey
  * @see #LOGGER
  * @see #DEBUGLOGGER
- * @see net.sf.log4jdbc.Slf4jSpyLogDelegator
- * @see net.sf.log4jdbc.SpyLogDelegator
- * @see net.sf.log4jdbc.DriverSpy
- * @see net.sf.log4jdbc.SpyLogFactory
+ * @see net.disy.oss.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+ * @see SpyLogDelegator
+ * @see net.disy.oss.log4jdbc.sql.jdbcapi.DriverSpy
+ * @see net.disy.oss.log4jdbc.log.SpyLogFactory
  */
 public class Log4j2SpyLogDelegator implements SpyLogDelegator
 {
@@ -94,7 +94,7 @@ public class Log4j2SpyLogDelegator implements SpyLogDelegator
     private static final Logger LOGGER = LogManager.getLogger("log4jdbc.log4j2");
     /**
      * Logger just for debugging things within log4jdbc itself (admin, setup, etc.)
-     * @see net.sf.log4jdbc.Log4j2SpyLogDelegator#debugLogger
+     * @see Log4j2SpyLogDelegator#debug
      */
     private static final Logger DEBUGLOGGER = LogManager.getLogger("log4jdbc.debug");
 
@@ -162,7 +162,7 @@ public class Log4j2SpyLogDelegator implements SpyLogDelegator
      * <code>Marker</code> to log JDBC <code>ResultSet</code>s as table.
      * Functionality inherited from log4jdbc-remix.
      * (corresponds to the "jdbc.resultsettable" logger in the log4jdbc-remix implementation)
-     * @see net.sf.log4jdbc.sql.resultsetcollector
+     * @see net.disy.oss.log4jdbc.sql.resultsetcollector
      */
     private static final Marker RESULTSETTABLE_MARKER =
             MarkerManager.getMarker("LOG4JDBC_RESULTSETTABLE", OTHER_MARKER);

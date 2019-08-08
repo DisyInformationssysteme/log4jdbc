@@ -56,8 +56,8 @@ public class SpyLogFactory
      * Return the <code>SpyLogDelegator</code>.
      * If not already initialized (for instance, using
      * {@link #setSpyLogDelegator(SpyLogDelegator)}), this getter will load it first,
-     * using the {@link net.sf.log4jdbc.log4j2.Properties#getSpyLogDelegatorName()}.
-     * If the name is <code>null</code>, load {@link net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator},
+     * using the {@link Properties#getSpyLogDelegatorName()}.
+     * If the name is <code>null</code>, load {@link Log4j2SpyLogDelegator},
      * otherwise, try to load the corresponding class.
      *
      * @return 	The <code>SpyLogDelegator</code> to use.
@@ -74,15 +74,15 @@ public class SpyLogFactory
     /**
      * Set the appropriate <code>SpyLogDelegator</code>
      * depending on <code>spyLogDelegatorName</code>.
-     * If <code>null</code>, load {@link net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator},
+     * If <code>null</code>, load {@link Log4j2SpyLogDelegator},
      * otherwise, try to load the corresponding class.
      *
      * @param spyLogDelegatorName 	A <code>String</code> representing the name
      * 								of the class implementing <code>SpyLogDelegator</code>
      * 								to load. If <code>null</code>,
      * 								load <code>Log4j2SpyLogDelegator</code>.
-     * @see Slf4jSpyLogDelegator
-     * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator
+     * @see net.disy.oss.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+     * @see Log4j2SpyLogDelegator
      */
     public static void loadSpyLogDelegator(String spyLogDelegatorName)
     {

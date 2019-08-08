@@ -8,7 +8,7 @@ import org.apache.logging.log4j.message.Message;
  * <code>SqlMessage</code> related to the logging of <code>Exception</code>s.
  *
  * @author Frederic Bastian
- * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#exceptionOccured(net.disy.oss.log4jdbc.sql.Spy, String, Exception, String, long)
+ * @see net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator#exceptionOccured(net.disy.oss.log4jdbc.sql.Spy, String, Exception, String, long)
  * @version 1.0
  * @since 1.0
  */
@@ -61,7 +61,6 @@ public class ExceptionOccuredMessage extends SqlMessage implements Message
      * @param spy        	the <code>Spy</code> wrapping the class that threw an <code>Exception</code>.
      * @param methodCall 	a <code>String</code> describing the name and call parameters
      * 						of the method generated the <code>Exception</code>.
-     * @param e          	the <code>Exception</code> that was thrown.
      * @param sql        	optional <code>String</code> representing the sql that occurred
      * 						just before the exception occurred.
      * @param execTime   	optional <code>long</code> representing the amount of time
@@ -70,9 +69,9 @@ public class ExceptionOccuredMessage extends SqlMessage implements Message
      * @param isDebugEnabled A <code>boolean</code> to define whether debugInfo should be displayed.
      */
     public ExceptionOccuredMessage(Spy spy, String methodCall,
-	        String sql, long execTime, boolean isdebugEnabled) {
+	        String sql, long execTime, boolean isDebugEnabled) {
 
-		super(isdebugEnabled);
+		super(isDebugEnabled);
 
 		this.spy = spy;
 		this.methodCall = methodCall;

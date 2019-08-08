@@ -206,7 +206,7 @@ public abstract class SqlMessage
 
     	if (stackTrace != null) {
     		String className;
-    		StringBuffer dump = new StringBuffer();
+    		StringBuilder dump = new StringBuilder();
 
     		/**
     		 * The DumpFullDebugStackTrace option is useful in some situations when

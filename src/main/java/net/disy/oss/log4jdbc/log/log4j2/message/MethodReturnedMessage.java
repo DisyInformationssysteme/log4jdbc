@@ -8,7 +8,7 @@ import org.apache.logging.log4j.message.Message;
  * <code>SqlMessage</code> related to the logging of methods calls returns.
  *
  * @author Frederic Bastian
- * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#methodReturned(net.disy.oss.log4jdbc.sql.Spy, String, String)
+ * @see net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator#methodReturned(net.disy.oss.log4jdbc.sql.Spy, String, String)
  * @version 1.0
  * @since 1.0
  */

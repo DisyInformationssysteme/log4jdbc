@@ -10,8 +10,8 @@ import org.apache.logging.log4j.message.Message;
  *
  * @author Frederic Bastian
  * @author Mathieu Seppey
- * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#connectionOpened(net.disy.oss.log4jdbc.sql.Spy, long)
- * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#connectionClosed(net.disy.oss.log4jdbc.sql.Spy, long)
+ * @see net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator#connectionOpened(net.disy.oss.log4jdbc.sql.Spy, long)
+ * @see net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator#connectionClosed(net.disy.oss.log4jdbc.sql.Spy, long)
  * @version 1.0
  * @since 1.0
  */
@@ -22,12 +22,11 @@ public class ConnectionMessage extends SqlMessage implements Message
   /**
    * An <code>enum</code> to define the value of <code>operation</code>
    * when the action on the connection was to open,close or abort it.
-   * @see operation
+   * @see #operation
    */
-  public static enum Operation
-  {
+  public enum Operation {
     OPENING, CLOSING, ABORTING;
-  };
+  }
 
   /**
    * <code>ConnectionSpy</code> that was opened or closed.
@@ -41,7 +40,7 @@ public class ConnectionMessage extends SqlMessage implements Message
    * Should be equals to <code>OPENING</code> if the operation was to open the connection,
    * to <code>CLOSING</code> if the operation was to close the connection.
    * Will be used to build the <code>message</code>, only when needed.
-   * @see #Operation
+   * @see Operation
    * @see #message
    * @see #buildMessage()
    */

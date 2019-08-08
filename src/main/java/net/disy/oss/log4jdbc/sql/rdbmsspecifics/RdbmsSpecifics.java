@@ -64,9 +64,9 @@ public class RdbmsSpecifics
 		}
 		else if (object instanceof Boolean)
 		{
-			return Properties.isDumpBooleanAsTrueFalse()?
-					((Boolean)object).booleanValue()?"true":"false"
-						:((Boolean)object).booleanValue()?"1":"0";
+			return Properties.isDumpBooleanAsTrueFalse()
+					? (Boolean) object ? "true" : "false"
+					: (Boolean) object ? "1" : "0";
 		}
 		else
 		{

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.message.Message;
  * <code>SqlMessage</code> related to the logging of SQL statements, with execution time information.
  *
  * @author Frederic Bastian
- * @see net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator#sqlTimingOccurred(net.disy.oss.log4jdbc.sql.Spy, long, String, String)
+ * @see net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator#sqlTimingOccurred(net.disy.oss.log4jdbc.sql.Spy, long, String, String)
  * @version 1.0
  * @since 1.0
  */
@@ -77,7 +77,7 @@ public class SqlTimingOccurredMessage extends SqlMessage implements Message
 	@Override
 	protected void buildMessage()
 	{
-	    StringBuffer out = new StringBuffer();
+	    StringBuilder out = new StringBuilder();
 
 	    if (this.isDebugEnabled())
 	    {

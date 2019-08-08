@@ -31,7 +31,7 @@ public class Utilities {
     {
       field="";
     }
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
     for (int i=0, j = fieldSize-field.length(); i < j; i++)
     {
       output.append(' ');
