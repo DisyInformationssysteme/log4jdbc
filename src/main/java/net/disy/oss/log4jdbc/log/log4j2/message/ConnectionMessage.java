@@ -1,9 +1,9 @@
 package net.disy.oss.log4jdbc.log.log4j2.message;
 
+import org.apache.logging.log4j.message.Message;
+
 import net.disy.oss.log4jdbc.sql.Spy;
 import net.disy.oss.log4jdbc.sql.jdbcapi.ConnectionSpy;
-
-import org.apache.logging.log4j.message.Message;
 
 /**
  * <code>SqlMessage</code> related to connection events.
@@ -15,8 +15,7 @@ import org.apache.logging.log4j.message.Message;
  * @version 1.0
  * @since 1.0
  */
-public class ConnectionMessage extends SqlMessage implements Message
-{
+public class ConnectionMessage extends SqlMessage implements Message {
   private static final long serialVersionUID = 6278727380958233518L;
 
   /**
@@ -56,23 +55,21 @@ public class ConnectionMessage extends SqlMessage implements Message
   /**
    * Default constructor
    */
-  public ConnectionMessage()
-  {
+  public ConnectionMessage() {
     this(null, -1L, null, false);
   }
 
   /**
    *
-   * @param spy 			<code>ConnectionSpy</code> that was opened or closed.
-   * @param execTime 		A <code>long</code> defining the time elapsed to open or close the connection in ms
+   * @param spy      <code>ConnectionSpy</code> that was opened or closed.
+   * @param execTime    A <code>long</code> defining the time elapsed to open or close the connection in ms
    * 					Caller should pass -1 if not used
-   * @param operation 	an <code>int</code> to define if the operation was to open, or to close connection.
+   * @param operation  an <code>int</code> to define if the operation was to open, or to close connection.
    * 						Should be equals to <code>OPENING</code> if the operation was to open the connection,
    * 						to <code>CLOSING</code> if the operation was to close the connection.
    * @param isDebugEnabled A <code>boolean</code> to define whether debugInfo should be displayed.
    */
-  public ConnectionMessage(Spy spy, long execTime, Operation operation, boolean isDebugEnabled)
-  {
+  public ConnectionMessage(Spy spy, long execTime, Operation operation, boolean isDebugEnabled) {
     super(isDebugEnabled);
 
     this.spy = spy;
@@ -85,8 +82,7 @@ public class ConnectionMessage extends SqlMessage implements Message
   }
 
   @Override
-  protected void buildMessage()
-  {
+  protected void buildMessage() {
     StringBuffer buildMsg = new StringBuffer();
 
     if (this.isDebugEnabled()) {

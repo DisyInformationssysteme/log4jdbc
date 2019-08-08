@@ -27,9 +27,9 @@ import java.sql.NClob;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Ref;
-import java.sql.RowId;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.sql.Statement;
@@ -39,9 +39,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 import net.disy.oss.log4jdbc.sql.Spy;
 import net.disy.oss.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
-import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a PreparedStatement and reports method calls, returns and exceptions.
@@ -53,8 +53,7 @@ import net.disy.oss.log4jdbc.log.SpyLogDelegator;
  *
  * @author Arthur Blake
  */
-public class PreparedStatementSpy extends StatementSpy implements PreparedStatement
-{
+public class PreparedStatementSpy extends StatementSpy implements PreparedStatement {
 
   /**
    * holds list of bind variables for tracing
@@ -73,69 +72,52 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
    * @param typeHelper optional additional info about the type that is being set in the arg
    * @param arg        argument being bound.
    */
-  protected void argTraceSet(int i, String typeHelper, Object arg)
-  {
+  protected void argTraceSet(int i, String typeHelper, Object arg) {
     String tracedArg;
-    try
-    {
+    try {
       tracedArg = rdbmsSpecifics.formatParameterObject(arg);
-    }
-    catch (Throwable t)
-    {
+    } catch (Throwable t) {
       // rdbmsSpecifics should NEVER EVER throw an exception!!
       // but just in case it does, we trap it.
       log.debug("rdbmsSpecifics threw an exception while trying to format a " +
-        "parameter object [" + arg + "] this is very bad!!! (" +
-        t.getMessage() + ")");
+          "parameter object [" + arg + "] this is very bad!!! (" +
+          t.getMessage() + ")");
 
       // backup - so that at least we won't harm the application using us
-      tracedArg = arg==null?"null":arg.toString();
+      tracedArg = arg == null ? "null" : arg.toString();
     }
 
     i--;  // make the index 0 based
-    synchronized (argTrace)
-    {
+    synchronized (argTrace) {
       // if an object is being inserted out of sequence, fill up missing values with null...
-      while (i >= argTrace.size())
-      {
+      while (i >= argTrace.size()) {
         argTrace.add(argTrace.size(), null);
       }
-      if (!showTypeHelp)
-      {
+      if (!showTypeHelp) {
         argTrace.set(i, tracedArg);
-      }
-      else
-      {
+      } else {
         argTrace.set(i, typeHelper + tracedArg);
       }
     }
   }
 
-
-  protected String dumpedSql()
-  {
+  protected String dumpedSql() {
     StringBuilder dumpSql = new StringBuilder();
     int lastPos = 0;
     int qPos = sql.indexOf('?', lastPos);  // find position of first question mark
     int argIdx = 0;
     String arg;
 
-    while (qPos != -1)
-    {
+    while (qPos != -1) {
       // get stored argument
-      synchronized (argTrace)
-      {
-        try
-        {
+      synchronized (argTrace) {
+        try {
           arg = argTrace.get(argIdx);
-        }
-        catch (IndexOutOfBoundsException e)
-        {
+        } catch (IndexOutOfBoundsException e) {
           arg = "?";
         }
       }
-      if (arg == null)
-      {
+      if (arg == null) {
         arg = "?";
       }
 
@@ -146,16 +128,14 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
       qPos = sql.indexOf('?', lastPos);
       dumpSql.append(arg);
     }
-    if (lastPos < sql.length())
-    {
+    if (lastPos < sql.length()) {
       dumpSql.append(sql.substring(lastPos, sql.length()));  // dump last segment
     }
 
     return dumpSql.toString();
   }
 
-  protected void reportAllReturns(String methodCall, String msg)
-  {
+  protected void reportAllReturns(String methodCall, String msg) {
     log.methodReturned(this, methodCall, msg);
   }
 
@@ -169,8 +149,7 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
    *
    * @return the real PreparedStatement that this PreparedStatementSpy wraps.
    */
-  public PreparedStatement getRealPreparedStatement()
-  {
+  public PreparedStatement getRealPreparedStatement() {
     return realPreparedStatement;
   }
 
@@ -185,37 +164,32 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
    * @param sql                   SQL for the prepared statement that is being spied upon.
    * @param connectionSpy         ConnectionSpy that was called to produce this PreparedStatement.
    * @param realPreparedStatement The actual PreparedStatement that is being spied upon.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * @param logDelegator  The <code>SpyLogDelegator</code> used by
    * 						this <code>PreparedStatementSpy</code> and all resources obtained
    * 						from it (<code>ResultSet</code>s)
    */
-  public PreparedStatementSpy(String sql, ConnectionSpy connectionSpy,
-		  PreparedStatement realPreparedStatement, SpyLogDelegator logDelegator)
-  {
+  public PreparedStatementSpy(
+      String sql, ConnectionSpy connectionSpy,
+      PreparedStatement realPreparedStatement, SpyLogDelegator logDelegator) {
     super(connectionSpy, realPreparedStatement, logDelegator);  // does null check for us
     this.sql = sql;
     this.realPreparedStatement = realPreparedStatement;
     rdbmsSpecifics = connectionSpy.getRdbmsSpecifics();
   }
 
-  public String getClassType()
-  {
+  public String getClassType() {
     return "PreparedStatement";
   }
 
   // forwarding methods
 
   @Override
-  public void setTime(int parameterIndex, Time x) throws SQLException
-  {
+  public void setTime(int parameterIndex, Time x) throws SQLException {
     String methodCall = "setTime(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(Time)", x);
-    try
-    {
+    try {
       realPreparedStatement.setTime(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -223,16 +197,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException
-  {
+  public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
     String methodCall = "setTime(" + parameterIndex + ", " + x + ", " + cal + ")";
     argTraceSet(parameterIndex, "(Time)", x);
-    try
-    {
+    try {
       realPreparedStatement.setTime(parameterIndex, x, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -240,16 +210,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException
-  {
+  public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
     String methodCall = "setCharacterStream(" + parameterIndex + ", " + reader + ", " + length + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setCharacterStream(parameterIndex, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -257,16 +223,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setNull(int parameterIndex, int sqlType) throws SQLException
-  {
+  public void setNull(int parameterIndex, int sqlType) throws SQLException {
     String methodCall = "setNull(" + parameterIndex + ", " + sqlType + ")";
     argTraceSet(parameterIndex, null, null);
-    try
-    {
+    try {
       realPreparedStatement.setNull(parameterIndex, sqlType);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -274,16 +236,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setNull(int paramIndex, int sqlType, String typeName) throws SQLException
-  {
+  public void setNull(int paramIndex, int sqlType, String typeName) throws SQLException {
     String methodCall = "setNull(" + paramIndex + ", " + sqlType + ", " + typeName + ")";
     argTraceSet(paramIndex, null, null);
-    try
-    {
+    try {
       realPreparedStatement.setNull(paramIndex, sqlType, typeName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -291,16 +249,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setRef(int i, Ref x) throws SQLException
-  {
+  public void setRef(int i, Ref x) throws SQLException {
     String methodCall = "setRef(" + i + ", " + x + ")";
     argTraceSet(i, "(Ref)", x);
-    try
-    {
+    try {
       realPreparedStatement.setRef(i, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -308,16 +262,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setBoolean(int parameterIndex, boolean x) throws SQLException
-  {
+  public void setBoolean(int parameterIndex, boolean x) throws SQLException {
     String methodCall = "setBoolean(" + parameterIndex + ", " + x + ")";
-    argTraceSet(parameterIndex, "(boolean)", x?Boolean.TRUE:Boolean.FALSE);
-    try
-    {
+    argTraceSet(parameterIndex, "(boolean)", x ? Boolean.TRUE : Boolean.FALSE);
+    try {
       realPreparedStatement.setBoolean(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -325,17 +275,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setBlob(int i, Blob x) throws SQLException
-  {
+  public void setBlob(int i, Blob x) throws SQLException {
     String methodCall = "setBlob(" + i + ", " + x + ")";
     argTraceSet(i, "(Blob)",
-      x==null?null:("<Blob of size " + x.length() + ">"));
-    try
-    {
+        x == null ? null : ("<Blob of size " + x.length() + ">"));
+    try {
       realPreparedStatement.setBlob(i, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -343,17 +289,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setClob(int i, Clob x) throws SQLException
-  {
+  public void setClob(int i, Clob x) throws SQLException {
     String methodCall = "setClob(" + i + ", " + x + ")";
     argTraceSet(i, "(Clob)",
-      x==null?null:("<Clob of size " + x.length() + ">"));
-    try
-    {
+        x == null ? null : ("<Clob of size " + x.length() + ">"));
+    try {
       realPreparedStatement.setClob(i, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -361,16 +303,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setArray(int i, Array x) throws SQLException
-  {
+  public void setArray(int i, Array x) throws SQLException {
     String methodCall = "setArray(" + i + ", " + x + ")";
     argTraceSet(i, "(Array)", "<Array>");
-    try
-    {
+    try {
       realPreparedStatement.setArray(i, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -378,16 +316,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setByte(int parameterIndex, byte x) throws SQLException
-  {
+  public void setByte(int parameterIndex, byte x) throws SQLException {
     String methodCall = "setByte(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(byte)", x);
-    try
-    {
+    try {
       realPreparedStatement.setByte(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -398,16 +332,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
    * @deprecated
    */
   @Override
-  public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException
-  {
+  public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
     String methodCall = "setUnicodeStream(" + parameterIndex + ", " + x + ", " + length + ")";
     argTraceSet(parameterIndex, "(Unicode InputStream)", "<Unicode InputStream of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setUnicodeStream(parameterIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -415,16 +345,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setShort(int parameterIndex, short x) throws SQLException
-  {
+  public void setShort(int parameterIndex, short x) throws SQLException {
     String methodCall = "setShort(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(short)", x);
-    try
-    {
+    try {
       realPreparedStatement.setShort(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -432,36 +358,28 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public boolean execute() throws SQLException
-  {
+  public boolean execute() throws SQLException {
     String methodCall = "execute()";
     String dumpedSql = dumpedSql();
     reportSql(dumpedSql, methodCall);
     long tstart = System.currentTimeMillis();
-    try
-    {
+    try {
       boolean result = realPreparedStatement.execute();
       reportSqlTiming(System.currentTimeMillis() - tstart, dumpedSql, methodCall);
       return reportReturn(methodCall, result);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, dumpedSql, System.currentTimeMillis() - tstart);
       throw s;
     }
   }
 
   @Override
-  public void setInt(int parameterIndex, int x) throws SQLException
-  {
+  public void setInt(int parameterIndex, int x) throws SQLException {
     String methodCall = "setInt(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(int)", x);
-    try
-    {
+    try {
       realPreparedStatement.setInt(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -469,16 +387,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setLong(int parameterIndex, long x) throws SQLException
-  {
+  public void setLong(int parameterIndex, long x) throws SQLException {
     String methodCall = "setLong(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(long)", x);
-    try
-    {
+    try {
       realPreparedStatement.setLong(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -486,16 +400,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setFloat(int parameterIndex, float x) throws SQLException
-  {
+  public void setFloat(int parameterIndex, float x) throws SQLException {
     String methodCall = "setFloat(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(float)", x);
-    try
-    {
+    try {
       realPreparedStatement.setFloat(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -503,16 +413,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setDouble(int parameterIndex, double x) throws SQLException
-  {
+  public void setDouble(int parameterIndex, double x) throws SQLException {
     String methodCall = "setDouble(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(double)", x);
-    try
-    {
+    try {
       realPreparedStatement.setDouble(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -520,16 +426,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException
-  {
+  public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
     String methodCall = "setBigDecimal(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(BigDecimal)", x);
-    try
-    {
+    try {
       realPreparedStatement.setBigDecimal(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -537,17 +439,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setURL(int parameterIndex, URL x) throws SQLException
-  {
+  public void setURL(int parameterIndex, URL x) throws SQLException {
     String methodCall = "setURL(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(URL)", x);
 
-    try
-    {
+    try {
       realPreparedStatement.setURL(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -555,17 +453,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setString(int parameterIndex, String x) throws SQLException
-  {
+  public void setString(int parameterIndex, String x) throws SQLException {
     String methodCall = "setString(" + parameterIndex + ", \"" + x + "\")";
     argTraceSet(parameterIndex, "(String)", x);
 
-    try
-    {
+    try {
       realPreparedStatement.setString(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -573,17 +467,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setBytes(int parameterIndex, byte[] x) throws SQLException
-  {
+  public void setBytes(int parameterIndex, byte[] x) throws SQLException {
     //todo: dump array?
     String methodCall = "setBytes(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(byte[])", "<byte[]>");
-    try
-    {
+    try {
       realPreparedStatement.setBytes(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -591,16 +481,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setDate(int parameterIndex, Date x) throws SQLException
-  {
+  public void setDate(int parameterIndex, Date x) throws SQLException {
     String methodCall = "setDate(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(Date)", x);
-    try
-    {
+    try {
       realPreparedStatement.setDate(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -608,15 +494,11 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public ParameterMetaData getParameterMetaData() throws SQLException
-  {
+  public ParameterMetaData getParameterMetaData() throws SQLException {
     String methodCall = "getParameterMetaData()";
-    try
-    {
+    try {
       return (ParameterMetaData) reportReturn(methodCall, realPreparedStatement.getParameterMetaData());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -626,12 +508,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setRowId(int parameterIndex, RowId x) throws SQLException {
     String methodCall = "setRowId(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(RowId)", x);
-    try
-    {
+    try {
       realPreparedStatement.setRowId(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -642,12 +521,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setNString(int parameterIndex, String value) throws SQLException {
     String methodCall = "setNString(" + parameterIndex + ", " + value + ")";
     argTraceSet(parameterIndex, "(String)", value);
-    try
-    {
+    try {
       realPreparedStatement.setNString(parameterIndex, value);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -658,12 +534,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
     String methodCall = "setNCharacterStream(" + parameterIndex + ", " + value + ", " + length + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setNCharacterStream(parameterIndex, value, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -674,12 +547,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setNClob(int parameterIndex, NClob value) throws SQLException {
     String methodCall = "setNClob(" + parameterIndex + ", " + value + ")";
     argTraceSet(parameterIndex, "(NClob)", "<NClob>");
-    try
-    {
+    try {
       realPreparedStatement.setNClob(parameterIndex, value);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -690,12 +560,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
     String methodCall = "setClob(" + parameterIndex + ", " + reader + ", " + length + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setClob(parameterIndex, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -706,12 +573,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
     String methodCall = "setBlob(" + parameterIndex + ", " + inputStream + ", " + length + ")";
     argTraceSet(parameterIndex, "(InputStream)", "<InputStream of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setBlob(parameterIndex, inputStream, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -722,12 +586,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
     String methodCall = "setNClob(" + parameterIndex + ", " + reader + ", " + length + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setNClob(parameterIndex, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -738,12 +599,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
     String methodCall = "setSQLXML(" + parameterIndex + ", " + xmlObject + ")";
     argTraceSet(parameterIndex, "(SQLXML)", xmlObject);
-    try
-    {
+    try {
       realPreparedStatement.setSQLXML(parameterIndex, xmlObject);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -751,17 +609,13 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setDate(int parameterIndex, Date x, Calendar cal) throws SQLException
-  {
+  public void setDate(int parameterIndex, Date x, Calendar cal) throws SQLException {
     String methodCall = "setDate(" + parameterIndex + ", " + x + ", " + cal + ")";
     argTraceSet(parameterIndex, "(Date)", x);
 
-    try
-    {
+    try {
       realPreparedStatement.setDate(parameterIndex, x, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -769,47 +623,37 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public ResultSet executeQuery() throws SQLException
-  {
+  public ResultSet executeQuery() throws SQLException {
     String methodCall = "executeQuery()";
     String dumpedSql = dumpedSql();
     reportSql(dumpedSql, methodCall);
     long tstart = System.currentTimeMillis();
-    try
-    {
+    try {
       ResultSet r = realPreparedStatement.executeQuery();
       reportSqlTiming(System.currentTimeMillis() - tstart, dumpedSql, methodCall);
       ResultSetSpy rsp = new ResultSetSpy(this, r, this.log);
       return (ResultSet) reportReturn(methodCall, rsp);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, dumpedSql, System.currentTimeMillis() - tstart);
       throw s;
     }
   }
 
-  private String getTypeHelp(Object x)
-  {
-    if (x==null)
-    {
+  private String getTypeHelp(Object x) {
+    if (x == null) {
       return "(null)";
     }
     return "(" + x.getClass().getName() + ")";
   }
 
   @Override
-  public void setObject(int parameterIndex, Object x, int targetSqlType, int scale) throws SQLException
-  {
+  public void setObject(int parameterIndex, Object x, int targetSqlType, int scale) throws SQLException {
     String methodCall = "setObject(" + parameterIndex + ", " + x + ", " + targetSqlType + ", " + scale + ")";
     argTraceSet(parameterIndex, getTypeHelp(x), x);
 
-    try
-    {
+    try {
       realPreparedStatement.setObject(parameterIndex, x, targetSqlType, scale);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -841,12 +685,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
     String methodCall = "setAsciiStream(" + parameterIndex + ", " + x + ", " + length + ")";
     argTraceSet(parameterIndex, "(Ascii InputStream)", "<Ascii InputStream of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setAsciiStream(parameterIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -857,12 +698,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
     String methodCall = "setBinaryStream(" + parameterIndex + ", " + x + ", " + length + ")";
     argTraceSet(parameterIndex, "(Binary InputStream)", "<Binary InputStream of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setBinaryStream(parameterIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -873,12 +711,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
     String methodCall = "setCharacterStream(" + parameterIndex + ", " + reader + ", " + length + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setCharacterStream(parameterIndex, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -890,12 +725,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
     String methodCall = "setAsciiStream(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(Ascii InputStream)", "<Ascii InputStream>");
-    try
-    {
+    try {
       realPreparedStatement.setAsciiStream(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -906,12 +738,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
     String methodCall = "setBinaryStream(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(Binary InputStream)", "<Binary InputStream>");
-    try
-    {
+    try {
       realPreparedStatement.setBinaryStream(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -923,12 +752,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
     String methodCall = "setCharacterStream(" + parameterIndex + ", " + reader + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader>");
-    try
-    {
+    try {
       realPreparedStatement.setCharacterStream(parameterIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -939,12 +765,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setNCharacterStream(int parameterIndex, Reader reader) throws SQLException {
     String methodCall = "setNCharacterStream(" + parameterIndex + ", " + reader + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader>");
-    try
-    {
+    try {
       realPreparedStatement.setNCharacterStream(parameterIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -955,12 +778,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setClob(int parameterIndex, Reader reader) throws SQLException {
     String methodCall = "setClob(" + parameterIndex + ", " + reader + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader>");
-    try
-    {
+    try {
       realPreparedStatement.setClob(parameterIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -971,12 +791,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
     String methodCall = "setBlob(" + parameterIndex + ", " + inputStream + ")";
     argTraceSet(parameterIndex, "(InputStream)", "<InputStream>");
-    try
-    {
+    try {
       realPreparedStatement.setBlob(parameterIndex, inputStream);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -987,12 +804,9 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   public void setNClob(int parameterIndex, Reader reader) throws SQLException {
     String methodCall = "setNClob(" + parameterIndex + ", " + reader + ")";
     argTraceSet(parameterIndex, "(Reader)", "<Reader>");
-    try
-    {
+    try {
       realPreparedStatement.setNClob(parameterIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1001,16 +815,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setObject(int parameterIndex, Object x, int targetSqlType) throws SQLException
-  {
+  public void setObject(int parameterIndex, Object x, int targetSqlType) throws SQLException {
     String methodCall = "setObject(" + parameterIndex + ", " + x + ", " + targetSqlType + ")";
     argTraceSet(parameterIndex, getTypeHelp(x), x);
-    try
-    {
+    try {
       realPreparedStatement.setObject(parameterIndex, x, targetSqlType);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1018,16 +828,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setObject(int parameterIndex, Object x) throws SQLException
-  {
+  public void setObject(int parameterIndex, Object x) throws SQLException {
     String methodCall = "setObject(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, getTypeHelp(x), x);
-    try
-    {
+    try {
       realPreparedStatement.setObject(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1035,16 +841,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException
-  {
+  public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
     String methodCall = "setTimestamp(" + parameterIndex + ", " + x + ")";
     argTraceSet(parameterIndex, "(Date)", x);
-    try
-    {
+    try {
       realPreparedStatement.setTimestamp(parameterIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1052,16 +854,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException
-  {
+  public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException {
     String methodCall = "setTimestamp(" + parameterIndex + ", " + x + ", " + cal + ")";
     argTraceSet(parameterIndex, "(Timestamp)", x);
-    try
-    {
+    try {
       realPreparedStatement.setTimestamp(parameterIndex, x, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1069,42 +867,33 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public int executeUpdate() throws SQLException
-  {
+  public int executeUpdate() throws SQLException {
     String methodCall = "executeUpdate()";
     String dumpedSql = dumpedSql();
     reportSql(dumpedSql, methodCall);
     long tstart = System.currentTimeMillis();
-    try
-    {
+    try {
       int result = realPreparedStatement.executeUpdate();
       reportSqlTiming(System.currentTimeMillis() - tstart, dumpedSql, methodCall);
       return reportReturn(methodCall, result);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, dumpedSql, System.currentTimeMillis() - tstart);
       throw s;
     }
   }
 
   @Override
-  public ResultSet getGeneratedKeys() throws SQLException
-  {
-	  return this.getGeneratedKeys(dumpedSql());
+  public ResultSet getGeneratedKeys() throws SQLException {
+    return this.getGeneratedKeys(dumpedSql());
   }
 
   @Override
-  public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException
-  {
+  public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
     String methodCall = "setAsciiStream(" + parameterIndex + ", " + x + ", " + length + ")";
     argTraceSet(parameterIndex, "(Ascii InputStream)", "<Ascii InputStream of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setAsciiStream(parameterIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1112,16 +901,12 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException
-  {
+  public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
     String methodCall = "setBinaryStream(" + parameterIndex + ", " + x + ", " + length + ")";
     argTraceSet(parameterIndex, "(Binary InputStream)", "<Binary InputStream of length " + length + ">");
-    try
-    {
+    try {
       realPreparedStatement.setBinaryStream(parameterIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1129,21 +914,16 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public void clearParameters() throws SQLException
-  {
+  public void clearParameters() throws SQLException {
     String methodCall = "clearParameters()";
 
-    synchronized (argTrace)
-    {
+    synchronized (argTrace) {
       argTrace.clear();
     }
 
-    try
-    {
+    try {
       realPreparedStatement.clearParameters();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1151,31 +931,23 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
   }
 
   @Override
-  public ResultSetMetaData getMetaData() throws SQLException
-  {
+  public ResultSetMetaData getMetaData() throws SQLException {
     String methodCall = "getMetaData()";
-    try
-    {
+    try {
       return (ResultSetMetaData) reportReturn(methodCall, realPreparedStatement.getMetaData());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void addBatch() throws SQLException
-  {
+  public void addBatch() throws SQLException {
     String methodCall = "addBatch()";
     currentBatch.add(dumpedSql());
-    try
-    {
+    try {
       realPreparedStatement.addBatch();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1184,39 +956,34 @@ public class PreparedStatementSpy extends StatementSpy implements PreparedStatem
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    String methodCall = "unwrap(" + (iface==null?"null":iface.getName()) + ")";
-    try
-    {
+    String methodCall = "unwrap(" + (iface == null ? "null" : iface.getName()) + ")";
+    try {
       //todo: double check this logic
       //NOTE: could call super.isWrapperFor to simplify this logic, but it would result in extra log output
       //because the super classes would be invoked, thus executing their logging methods too...
-      return (T)reportReturn(methodCall,
-        (iface != null && (iface==PreparedStatement.class||iface==Statement.class||iface== Spy.class))?
-          (T)this:
-          realPreparedStatement.unwrap(iface));
-    }
-    catch (SQLException s)
-    {
-      reportException(methodCall,s);
+      return (T) reportReturn(
+          methodCall,
+          (iface != null && (iface == PreparedStatement.class || iface == Statement.class || iface == Spy.class)) ?
+              (T) this :
+              realPreparedStatement.unwrap(iface));
+    } catch (SQLException s) {
+      reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean isWrapperFor(Class<?> iface) throws SQLException
-  {
-    String methodCall = "isWrapperFor(" + (iface==null?"null":iface.getName()) + ")";
-    try
-    {
+  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    String methodCall = "isWrapperFor(" + (iface == null ? "null" : iface.getName()) + ")";
+    try {
       //NOTE: could call super.isWrapperFor to simplify this logic, but it would result in extra log output
       //when the super classes would be invoked..
-      return reportReturn(methodCall,
-        (iface != null && (iface==PreparedStatement.class||iface==Statement.class||iface==Spy.class)) ||
-        realPreparedStatement.isWrapperFor(iface));
-    }
-    catch (SQLException s)
-    {
-      reportException(methodCall,s);
+      return reportReturn(
+          methodCall,
+          (iface != null && (iface == PreparedStatement.class || iface == Statement.class || iface == Spy.class)) ||
+              realPreparedStatement.isWrapperFor(iface));
+    } catch (SQLException s) {
+      reportException(methodCall, s);
       throw s;
     }
   }

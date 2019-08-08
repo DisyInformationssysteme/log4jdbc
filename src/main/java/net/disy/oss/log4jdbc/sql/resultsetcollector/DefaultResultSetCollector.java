@@ -26,7 +26,6 @@ import java.util.Map;
 
 import net.disy.oss.log4jdbc.sql.jdbcapi.ResultSetSpy;
 
-
 public class DefaultResultSetCollector implements ResultSetCollector {
 
   private static final String NULL_RESULT_SET_VAL = "[null]";
@@ -35,10 +34,11 @@ public class DefaultResultSetCollector implements ResultSetCollector {
   private boolean fillInUnreadValues = false;
 
   public DefaultResultSetCollector(boolean fillInUnreadValues) {
-	  this.reset();
-      this.fillInUnreadValues = fillInUnreadValues;
-      this.lastValueReturnedByNext = true;
+    this.reset();
+    this.fillInUnreadValues = fillInUnreadValues;
+    this.lastValueReturnedByNext = true;
   }
+
   /**
    * A {@code boolean} defining whether parameters of this {@code DefaultResultSetColector}
    * has already been obtained from a {@code ResultSetMetaData}.
@@ -93,7 +93,7 @@ public class DefaultResultSetCollector implements ResultSetCollector {
   private List<List<Object>> rows;
   private Map<String, Integer> colNameToColIndex;
   private int colIndex;
-  private static final List<String> GETTERS = Arrays.asList(new String[] { "getString", "getLong", "getInt", "getDate", "getTimestamp", "getTime",
+  private static final List<String> GETTERS = Arrays.asList(new String[]{ "getString", "getLong", "getInt", "getDate", "getTimestamp", "getTime",
       "getBigDecimal", "getFloat", "getDouble", "getByte", "getShort", "getObject", "getBoolean", });
 
   public List<List<Object>> getRows() {
@@ -117,65 +117,64 @@ public class DefaultResultSetCollector implements ResultSetCollector {
 
   @Override
   public void loadMetaDataIfNeeded(ResultSet rs) {
-	  //if data already loaded
-	  if (this.loaded) {
-		  return;
-	  }
-	  //otherwise, get all data now, so that we don't need
-	  //to use the ResultSetMetaData later (with some drivers,
-	  //it cannot be used once the ResultSet has been closed)
-      try {
-    	  if (!rs.isClosed()) {
-    		  this.loadMetaDataIfNeeded(rs.getMetaData());
-    	  }
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
+    //if data already loaded
+    if (this.loaded) {
+      return;
+    }
+    //otherwise, get all data now, so that we don't need
+    //to use the ResultSetMetaData later (with some drivers,
+    //it cannot be used once the ResultSet has been closed)
+    try {
+      if (!rs.isClosed()) {
+        this.loadMetaDataIfNeeded(rs.getMetaData());
       }
-      this.loaded = true;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    this.loaded = true;
   }
 
   /**
    * Perform the operations requested by {@link #loadMetaDataIfNeeded(ResultSet)},
    * using directly the related <code>ResultSetMetaData</code>.
-   * @param metaData 	The <code>ResultSetMetaData</code> through which the information
+   * @param metaData  The <code>ResultSetMetaData</code> through which the information
    * 					needed by {@link #loadMetaDataIfNeeded(ResultSet)} are obtained.
    */
-  private void loadMetaDataIfNeeded(ResultSetMetaData metaData)
-  {
-	  //if data already loaded
-	  if (this.loaded) {
-		  return;
-	  }
-	  //otherwise, get all data now, so that we don't need
-	  //to use the ResultSetMetaData later (with some drivers,
-	  //it cannot be used once the ResultSet has been closed)
-      try {
-          if (metaData == null) {
-              this.columnCount = 0;
-          } else {
-    	      this.columnCount = metaData.getColumnCount();
-          }
-    	  this.colNameToColIndex = new HashMap<String, Integer>(this.columnCount);
-    	  for (int column = 1; column <= this.columnCount; column++) {
-    		  String label = metaData.getColumnLabel(column).toLowerCase();
-    		  String name  = metaData.getColumnName(column).toLowerCase();
-    		  this.columnLabels.put(column, label);
-    		  this.columnNames.put(column, name);
-    		  colNameToColIndex.put(label, column);
-    		  colNameToColIndex.put(name, column);
-    	  }
-    	  this.loaded = true;
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
+  private void loadMetaDataIfNeeded(ResultSetMetaData metaData) {
+    //if data already loaded
+    if (this.loaded) {
+      return;
+    }
+    //otherwise, get all data now, so that we don't need
+    //to use the ResultSetMetaData later (with some drivers,
+    //it cannot be used once the ResultSet has been closed)
+    try {
+      if (metaData == null) {
+        this.columnCount = 0;
+      } else {
+        this.columnCount = metaData.getColumnCount();
       }
+      this.colNameToColIndex = new HashMap<String, Integer>(this.columnCount);
+      for (int column = 1; column <= this.columnCount; column++) {
+        String label = metaData.getColumnLabel(column).toLowerCase();
+        String name = metaData.getColumnName(column).toLowerCase();
+        this.columnLabels.put(column, label);
+        this.columnNames.put(column, name);
+        colNameToColIndex.put(label, column);
+        colNameToColIndex.put(name, column);
+      }
+      this.loaded = true;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String getColumnName(int column) {
-      return this.columnNames.get(column);
+    return this.columnNames.get(column);
   }
 
   public String getColumnLabel(int column) {
-	  return this.columnLabels.get(column);
+    return this.columnLabels.get(column);
   }
 
   /*
@@ -186,9 +185,9 @@ public class DefaultResultSetCollector implements ResultSetCollector {
    * java.lang.Object)
    */
   @Override
-  public boolean methodReturned(ResultSetSpy resultSetSpy, String methodCall, Object returnValue,
-		  Object targetObject, Object... methodParams)
-  {
+  public boolean methodReturned(
+      ResultSetSpy resultSetSpy, String methodCall, Object returnValue,
+      Object targetObject, Object... methodParams) {
 
     if (methodCall.startsWith("get") && methodParams != null && methodParams.length == 1) {
 
@@ -205,19 +204,20 @@ public class DefaultResultSetCollector implements ResultSetCollector {
       }
     }
     if ("next()".equals(methodCall) || "first()".equals(methodCall)) {
-    	this.lastValueReturnedByNext = (Boolean) returnValue;
+      this.lastValueReturnedByNext = (Boolean) returnValue;
     }
     if ("next()".equals(methodCall) || "first()".equals(methodCall) ||
-    		"close()".equals(methodCall)) {
+        "close()".equals(methodCall)) {
       loadMetaDataIfNeeded(resultSetSpy.getRealResultSet());
       boolean isEndOfResultSet =
-    		  //"close" triggers a printing only if the previous call to next
-    		  //did not return false (end of result set already reached)
-    		  ("close()".equals(methodCall) && this.lastValueReturnedByNext != false) ||
-    		  Boolean.FALSE.equals(returnValue) ;
+          //"close" triggers a printing only if the previous call to next
+          //did not return false (end of result set already reached)
+          ("close()".equals(methodCall) && this.lastValueReturnedByNext != false) ||
+              Boolean.FALSE.equals(returnValue);
       if (row != null) {
-        if (rows == null)
+        if (rows == null) {
           rows = new ArrayList<List<Object>>();
+        }
         rows.add(row);
         row = null;
       }
@@ -269,7 +269,7 @@ public class DefaultResultSetCollector implements ResultSetCollector {
   @Override
   public void preMethod(ResultSetSpy resultSetSpy, String methodCall, Object... methodParams) {
     if ((methodCall.equals("next()") || methodCall.equals("close()")) &&
-    		fillInUnreadValues) {
+        fillInUnreadValues) {
       if (row != null) {
         int colIndex = 0;
         for (Object v : row) {
@@ -277,11 +277,11 @@ public class DefaultResultSetCollector implements ResultSetCollector {
             Object resultSetValue = null;
             try {
               // Fill in any unread data
-              resultSetValue = JdbcUtils.getResultSetValue(resultSetSpy.getRealResultSet(),colIndex+1);
+              resultSetValue = JdbcUtils.getResultSetValue(resultSetSpy.getRealResultSet(), colIndex + 1);
             } catch (SQLException e) {
               resultSetValue = UNREAD_ERROR;
             }
-            if (resultSetValue!=null) {
+            if (resultSetValue != null) {
               row.set(colIndex, resultSetValue);
             } else {
               row.set(colIndex, NULL_RESULT_SET_VAL);

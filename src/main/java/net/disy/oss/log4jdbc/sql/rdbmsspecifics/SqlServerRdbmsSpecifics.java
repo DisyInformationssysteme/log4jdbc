@@ -20,10 +20,8 @@ package net.disy.oss.log4jdbc.sql.rdbmsspecifics;
  *
  * @author Arthur Blake
  */
-public class SqlServerRdbmsSpecifics extends RdbmsSpecifics
-{
-  public SqlServerRdbmsSpecifics()
-  {
+public class SqlServerRdbmsSpecifics extends RdbmsSpecifics {
+  public SqlServerRdbmsSpecifics() {
     super();
   }
 }

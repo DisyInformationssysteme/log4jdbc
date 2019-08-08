@@ -33,9 +33,10 @@ public interface ResultSetCollector {
    * Expected to be called by a ResultSetSpy for all jdbc methods.
    * @return true if the result set is complete (next() returns false)
    */
-  public boolean methodReturned(ResultSetSpy resultSetSpy,
-          String methodCall, Object returnValue, Object targetObject,
-          Object... methodParams);
+  public boolean methodReturned(
+      ResultSetSpy resultSetSpy,
+      String methodCall, Object returnValue, Object targetObject,
+      Object... methodParams);
 
   /**
    * Expected to be called by a ResultSetSpy for prior to the execution of all jdbc methods.
@@ -55,7 +56,7 @@ public interface ResultSetCollector {
   /**
    * @return the result set column name for a given column number previously obtained
    * from the <code>ResultSetMetaData</code>. Index starts from 1.
-   * @column 	An <code>int</code> representing the index of the column for which
+   * @column An <code>int</code> representing the index of the column for which
    * 			the name will be returned. Index starts from 1.
    */
   public String getColumnName(int column);
@@ -86,7 +87,7 @@ public interface ResultSetCollector {
    * the <code>ResultSetCollector</code> requested for the <code>ResultSetMetaData</code>
    * (for instance, if the method <code>next</code> was not previously called).
    *
-   * @param rs 		The real JDBC <code>ResultSet</code> that was wrapped into
+   * @param rs    The real JDBC <code>ResultSet</code> that was wrapped into
    * 				a <code>ResultSetSpy</code>.
    */
   public void loadMetaDataIfNeeded(ResultSet rs);

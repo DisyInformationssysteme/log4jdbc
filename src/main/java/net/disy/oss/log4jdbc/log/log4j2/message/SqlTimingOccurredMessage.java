@@ -1,8 +1,8 @@
 package net.disy.oss.log4jdbc.log.log4j2.message;
 
-import net.disy.oss.log4jdbc.sql.Spy;
-
 import org.apache.logging.log4j.message.Message;
+
+import net.disy.oss.log4jdbc.sql.Spy;
 
 /**
  * <code>SqlMessage</code> related to the logging of SQL statements, with execution time information.
@@ -12,88 +12,84 @@ import org.apache.logging.log4j.message.Message;
  * @version 1.0
  * @since 1.0
  */
-public class SqlTimingOccurredMessage extends SqlMessage implements Message
-{
-    private static final long serialVersionUID = 6455975917838453692L;
-    /**
-     * a <code>String</code> describing the name and call parameters
-     * of the method that generated the SQL.
-     * Will be used to build the <code>message</code>, only when needed.
-     * It is not used in the current implementation of log4jdbc
-     * @see #message
-     * @see #buildMessage()
-     */
-	@SuppressWarnings("unused")
-	private String methodCall;
-	/**
-     * how long it took the sql to run, in ms.
-     * Will be used to build the <code>message</code>, only when needed.
-     * @see #message
-     * @see #buildMessage()
-     */
-	private long execTime;
-	/**
-     * the <code>Spy</code> wrapping the class where the SQL occurred.
-     * Will be used to build the <code>message</code>, only when needed.
-     * @see #message
-     * @see #buildMessage()
-     */
-	private Spy spy;
-	/**
-     * A <code>String</code> representing the sql that occurred.
-     * Will be used to build the <code>message</code>, only when needed.
-     * @see #message
-     * @see #buildMessage()
-     */
-	private String sql;
+public class SqlTimingOccurredMessage extends SqlMessage implements Message {
+  private static final long serialVersionUID = 6455975917838453692L;
+  /**
+   * a <code>String</code> describing the name and call parameters
+   * of the method that generated the SQL.
+   * Will be used to build the <code>message</code>, only when needed.
+   * It is not used in the current implementation of log4jdbc
+   * @see #message
+   * @see #buildMessage()
+   */
+  @SuppressWarnings("unused")
+  private String methodCall;
+  /**
+   * how long it took the sql to run, in ms.
+   * Will be used to build the <code>message</code>, only when needed.
+   * @see #message
+   * @see #buildMessage()
+   */
+  private long execTime;
+  /**
+   * the <code>Spy</code> wrapping the class where the SQL occurred.
+   * Will be used to build the <code>message</code>, only when needed.
+   * @see #message
+   * @see #buildMessage()
+   */
+  private Spy spy;
+  /**
+   * A <code>String</code> representing the sql that occurred.
+   * Will be used to build the <code>message</code>, only when needed.
+   * @see #message
+   * @see #buildMessage()
+   */
+  private String sql;
 
-    /**
-     * Default Constructor
-     */
-    public SqlTimingOccurredMessage()
-    {
-    	this(null, -1, null, null, false);
+  /**
+   * Default Constructor
+   */
+  public SqlTimingOccurredMessage() {
+    this(null, -1, null, null, false);
+  }
+
+  /**
+   *
+   * @param spy      the <code>Spy</code> wrapping the class where the SQL occurred.
+   * @param execTime    how long it took the sql to run, in ms.
+   * @param methodCall  a <code>String</code> describing the name and call parameters
+   * 						of the method that generated the SQL.
+   * @param sql        A <code>String</code> representing the sql that occurred.
+   * @param isDebugEnabled A <code>boolean</code> to define whether debugInfo should be displayed.
+   */
+  public SqlTimingOccurredMessage(
+      Spy spy, long execTime, String methodCall, String sql,
+      boolean isDebugEnabled) {
+    super(isDebugEnabled);
+    this.spy = spy;
+    this.execTime = execTime;
+    this.methodCall = methodCall;
+    this.sql = sql;
+  }
+
+  @Override
+  protected void buildMessage() {
+    StringBuilder out = new StringBuilder();
+
+    if (this.isDebugEnabled()) {
+      out.append(SqlMessage.getDebugInfo());
+      out.append(SqlMessage.nl);
     }
 
-    /**
-     *
-     * @param spy 			the <code>Spy</code> wrapping the class where the SQL occurred.
-     * @param execTime   	how long it took the sql to run, in ms.
-     * @param methodCall 	a <code>String</code> describing the name and call parameters
-     * 						of the method that generated the SQL.
-     * @param sql       	A <code>String</code> representing the sql that occurred.
-     * @param isDebugEnabled A <code>boolean</code> to define whether debugInfo should be displayed.
-     */
-    public SqlTimingOccurredMessage(Spy spy, long execTime, String methodCall, String sql,
-    		boolean isDebugEnabled)
-    {
-    	super(isDebugEnabled);
-		this.spy = spy;
-		this.execTime = execTime;
-		this.methodCall = methodCall;
-		this.sql = sql;
-    }
+    out.append(this.spy.getConnectionNumber());
+    out.append(". ");
 
-	@Override
-	protected void buildMessage()
-	{
-	    StringBuilder out = new StringBuilder();
+    out.append(this.processSql(this.sql));
+    out.append(" {executed in ");
+    out.append(this.execTime);
+    out.append(" ms}");
 
-	    if (this.isDebugEnabled())
-	    {
-	      out.append(SqlMessage.getDebugInfo());
-	      out.append(SqlMessage.nl);
-	    }
-
-	    out.append(this.spy.getConnectionNumber());
-	    out.append(". ");
-
-	    out.append(this.processSql(this.sql));
-	    out.append(" {executed in ");
-	    out.append(this.execTime);
-	    out.append(" ms}");
-
-	    this.setMessage(out.toString());
-	}
+    this.setMessage(out.toString());
+  }
 
 }

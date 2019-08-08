@@ -25,15 +25,12 @@ public class Utilities {
    * @param field contents to right justify within field.
    * @return the field, right justified within the requested size.
    */
-  public static String rightJustify(int fieldSize, String field)
-  {
-    if (field==null)
-    {
-      field="";
+  public static String rightJustify(int fieldSize, String field) {
+    if (field == null) {
+      field = "";
     }
     StringBuilder output = new StringBuilder();
-    for (int i=0, j = fieldSize-field.length(); i < j; i++)
-    {
+    for (int i = 0, j = fieldSize - field.length(); i < j; i++) {
       output.append(' ');
     }
     output.append(field);

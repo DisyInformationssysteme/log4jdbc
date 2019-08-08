@@ -25,9 +25,9 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.NClob;
 import java.sql.Ref;
-import java.sql.RowId;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
@@ -37,10 +37,10 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 import net.disy.oss.log4jdbc.sql.Spy;
 import net.disy.oss.log4jdbc.sql.resultsetcollector.DefaultResultSetCollector;
 import net.disy.oss.log4jdbc.sql.resultsetcollector.ResultSetCollector;
-import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a ResultSet and reports method calls, returns and exceptions.
@@ -50,8 +50,7 @@ import net.disy.oss.log4jdbc.log.SpyLogDelegator;
  * @author Arthur Blake
  * @author Mathieu Seppey
  */
-public class ResultSetSpy implements ResultSet, Spy
-{
+public class ResultSetSpy implements ResultSet, Spy {
   private final SpyLogDelegator log;
 
   /**
@@ -65,8 +64,7 @@ public class ResultSetSpy implements ResultSet, Spy
    * @param methodCall description of method call and arguments passed to it that generated the exception.
    * @param exception exception that was generated
    */
-  protected void reportException(String methodCall, SQLException exception)
-  {
+  protected void reportException(String methodCall, SQLException exception) {
     log.exceptionOccured(this, methodCall, exception, null, -1L);
   }
 
@@ -76,11 +74,10 @@ public class ResultSetSpy implements ResultSet, Spy
    * is closed.
    * @see #close()
    */
-  private void loadMetaDataIfNeeded()
-  {
-	  if (resultSetCollector != null) {
-		  resultSetCollector.loadMetaDataIfNeeded(realResultSet);
-	  }
+  private void loadMetaDataIfNeeded() {
+    if (resultSetCollector != null) {
+      resultSetCollector.loadMetaDataIfNeeded(realResultSet);
+    }
   }
 
   /**
@@ -90,16 +87,13 @@ public class ResultSetSpy implements ResultSet, Spy
    * @param methodCall description of method call and arguments passed to it that returned.
    * @param msg description of what the return value that was returned.  may be an empty String for void return types.
    */
-  protected void reportAllReturns(String methodCall, Object returnValue, Object... methodParams)
-  {
+  protected void reportAllReturns(String methodCall, Object returnValue, Object... methodParams) {
 
-    if (resultSetCollector != null)
-    {
+    if (resultSetCollector != null) {
 
       // Give the result set collector a chance to do its work
       boolean finished = resultSetCollector.methodReturned(this, methodCall, returnValue, realResultSet, methodParams);
-      if (finished)
-      {
+      if (finished) {
 
         log.resultSetCollected(resultSetCollector);
         resultSetCollector.reset();
@@ -108,7 +102,7 @@ public class ResultSetSpy implements ResultSet, Spy
 
     String toString = "void";
     if (returnValue != null) {
-    	toString = returnValue.toString();
+      toString = returnValue.toString();
     }
     log.methodReturned(this, methodCall, toString);
   }
@@ -120,8 +114,7 @@ public class ResultSetSpy implements ResultSet, Spy
    *
    * @return the real ResultSet that this ResultSetSpy wraps.
    */
-  public ResultSet getRealResultSet()
-  {
+  public ResultSet getRealResultSet() {
     return realResultSet;
   }
 
@@ -130,11 +123,10 @@ public class ResultSetSpy implements ResultSet, Spy
    * to log result set content. Useful for developers who want to use
    * their own custom collector.
    *
-   * @param resultSetCollector 	A <code>ResultSetCollector</code> used to collect
+   * @param resultSetCollector  A <code>ResultSetCollector</code> used to collect
    * 							the data of this <code>ResultSetSpy</code>.
    */
-  public void setResultSetCollector(ResultSetCollector resultSetCollector)
-  {
+  public void setResultSetCollector(ResultSetCollector resultSetCollector) {
     this.resultSetCollector = resultSetCollector;
   }
 
@@ -145,21 +137,19 @@ public class ResultSetSpy implements ResultSet, Spy
    *
    * @param parent Statement that generated this ResultSet.
    * @param realResultSet real underlying ResultSet that is being wrapped.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * @param logDelegator  The <code>SpyLogDelegator</code> used by
    * 						this <code>ResultSetSpy</code>.
    */
-  public ResultSetSpy(StatementSpy parent, ResultSet realResultSet,
-		  SpyLogDelegator logDelegator)
-  {
-    if (realResultSet == null)
-    {
+  public ResultSetSpy(
+      StatementSpy parent, ResultSet realResultSet,
+      SpyLogDelegator logDelegator) {
+    if (realResultSet == null) {
       throw new IllegalArgumentException("Must provide a non null real ResultSet");
     }
     this.realResultSet = realResultSet;
     this.parent = parent;
     this.log = logDelegator;
-    if (log.isResultSetCollectionEnabled())
-    {
+    if (log.isResultSetCollectionEnabled()) {
       resultSetCollector = new DefaultResultSetCollector(log.isResultSetCollectionEnabledWithUnreadValueFillIn());
     }
     reportReturn("new ResultSet", "", realResultSet);
@@ -170,13 +160,11 @@ public class ResultSetSpy implements ResultSet, Spy
    */
   public static final String classTypeDescription = "ResultSet";
 
-  public String getClassType()
-  {
+  public String getClassType() {
     return classTypeDescription;
   }
 
-  public Integer getConnectionNumber()
-  {
+  public Integer getConnectionNumber() {
     return parent.getConnectionNumber();
   }
 
@@ -187,8 +175,7 @@ public class ResultSetSpy implements ResultSet, Spy
    * @param returnValue return T.
    * @return the return Object as passed in.
    */
-  protected <T> T reportReturn(String methodCall, T returnValue, Object... args)
-  {
+  protected <T> T reportReturn(String methodCall, T returnValue, Object... args) {
     reportAllReturns(methodCall, returnValue, args);
     return returnValue;
   }
@@ -196,15 +183,11 @@ public class ResultSetSpy implements ResultSet, Spy
   // forwarding methods
 
   @Override
-  public void updateAsciiStream(int columnIndex, InputStream x, int length) throws SQLException
-  {
+  public void updateAsciiStream(int columnIndex, InputStream x, int length) throws SQLException {
     String methodCall = "updateAsciiStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateAsciiStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -212,15 +195,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateAsciiStream(String columnName, InputStream x, int length) throws SQLException
-  {
+  public void updateAsciiStream(String columnName, InputStream x, int length) throws SQLException {
     String methodCall = "updateAsciiStream(" + columnName + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateAsciiStream(columnName, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -228,30 +207,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public int getRow() throws SQLException
-  {
+  public int getRow() throws SQLException {
     String methodCall = "getRow()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getRow(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void cancelRowUpdates() throws SQLException
-  {
+  public void cancelRowUpdates() throws SQLException {
     String methodCall = "cancelRowUpdates()";
-    try
-    {
+    try {
       realResultSet.cancelRowUpdates();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -259,105 +230,77 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Time getTime(int columnIndex) throws SQLException
-  {
+  public Time getTime(int columnIndex) throws SQLException {
     String methodCall = "getTime(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTime(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Time getTime(String columnName) throws SQLException
-  {
+  public Time getTime(String columnName) throws SQLException {
     String methodCall = "getTime(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTime(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Time getTime(int columnIndex, Calendar cal) throws SQLException
-  {
+  public Time getTime(int columnIndex, Calendar cal) throws SQLException {
     String methodCall = "getTime(" + columnIndex + ", " + cal + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTime(columnIndex, cal), columnIndex, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Time getTime(String columnName, Calendar cal) throws SQLException
-  {
+  public Time getTime(String columnName, Calendar cal) throws SQLException {
     String methodCall = "getTime(" + columnName + ", " + cal + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTime(columnName, cal), columnName, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean absolute(int row) throws SQLException
-  {
+  public boolean absolute(int row) throws SQLException {
     String methodCall = "absolute(" + row + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.absolute(row), row);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Timestamp getTimestamp(int columnIndex) throws SQLException
-  {
+  public Timestamp getTimestamp(int columnIndex) throws SQLException {
     String methodCall = "getTimestamp(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTimestamp(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Timestamp getTimestamp(String columnName) throws SQLException
-  {
+  public Timestamp getTimestamp(String columnName) throws SQLException {
     String methodCall = "getTimestamp(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTimestamp(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -365,16 +308,12 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException
-  {
+  public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
     String methodCall = "getTimestamp(" + columnIndex + ", " + cal + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTimestamp(columnIndex, cal),
-    		  columnIndex, cal);
-    }
-    catch (SQLException s)
-    {
+          columnIndex, cal);
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -382,31 +321,23 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Timestamp getTimestamp(String columnName, Calendar cal) throws SQLException
-  {
+  public Timestamp getTimestamp(String columnName, Calendar cal) throws SQLException {
     String methodCall = "getTimestamp(" + columnName + ", " + cal + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getTimestamp(columnName, cal),
-    		  columnName, cal);
-    }
-    catch (SQLException s)
-    {
+          columnName, cal);
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void moveToInsertRow() throws SQLException
-  {
+  public void moveToInsertRow() throws SQLException {
     String methodCall = "moveToInsertRow()";
-    try
-    {
+    try {
       realResultSet.moveToInsertRow();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -414,45 +345,33 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public boolean relative(int rows) throws SQLException
-  {
+  public boolean relative(int rows) throws SQLException {
     String methodCall = "relative(" + rows + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.relative(rows), rows);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean previous() throws SQLException
-  {
+  public boolean previous() throws SQLException {
     String methodCall = "previous()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.previous(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void moveToCurrentRow() throws SQLException
-  {
+  public void moveToCurrentRow() throws SQLException {
     String methodCall = "moveToCurrentRow()";
-    try
-    {
+    try {
       realResultSet.moveToCurrentRow();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -460,30 +379,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Ref getRef(int i) throws SQLException
-  {
+  public Ref getRef(int i) throws SQLException {
     String methodCall = "getRef(" + i + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getRef(i), i);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateRef(int columnIndex, Ref x) throws SQLException
-  {
+  public void updateRef(int columnIndex, Ref x) throws SQLException {
     String methodCall = "updateRef(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateRef(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -491,30 +402,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Ref getRef(String colName) throws SQLException
-  {
+  public Ref getRef(String colName) throws SQLException {
     String methodCall = "getRef(" + colName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getRef(colName), colName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateRef(String columnName, Ref x) throws SQLException
-  {
+  public void updateRef(String columnName, Ref x) throws SQLException {
     String methodCall = "updateRef(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateRef(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -522,30 +425,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Blob getBlob(int i) throws SQLException
-  {
+  public Blob getBlob(int i) throws SQLException {
     String methodCall = "getBlob(" + i + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBlob(i), i);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateBlob(int columnIndex, Blob x) throws SQLException
-  {
+  public void updateBlob(int columnIndex, Blob x) throws SQLException {
     String methodCall = "updateBlob(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBlob(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -553,30 +448,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Blob getBlob(String colName) throws SQLException
-  {
+  public Blob getBlob(String colName) throws SQLException {
     String methodCall = "getBlob(" + colName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBlob(colName), colName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateBlob(String columnName, Blob x) throws SQLException
-  {
+  public void updateBlob(String columnName, Blob x) throws SQLException {
     String methodCall = "updateBlob(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBlob(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -584,30 +471,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Clob getClob(int i) throws SQLException
-  {
+  public Clob getClob(int i) throws SQLException {
     String methodCall = "getClob(" + i + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getClob(i), i);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateClob(int columnIndex, Clob x) throws SQLException
-  {
+  public void updateClob(int columnIndex, Clob x) throws SQLException {
     String methodCall = "updateClob(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateClob(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -615,30 +494,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Clob getClob(String colName) throws SQLException
-  {
+  public Clob getClob(String colName) throws SQLException {
     String methodCall = "getClob(" + colName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getClob(colName), colName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateClob(String columnName, Clob x) throws SQLException
-  {
+  public void updateClob(String columnName, Clob x) throws SQLException {
     String methodCall = "updateClob(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateClob(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -646,60 +517,44 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public boolean getBoolean(int columnIndex) throws SQLException
-  {
+  public boolean getBoolean(int columnIndex) throws SQLException {
     String methodCall = "getBoolean(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBoolean(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean getBoolean(String columnName) throws SQLException
-  {
+  public boolean getBoolean(String columnName) throws SQLException {
     String methodCall = "getBoolean(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBoolean(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Array getArray(int i) throws SQLException
-  {
+  public Array getArray(int i) throws SQLException {
     String methodCall = "getArray(" + i + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getArray(i), i);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateArray(int columnIndex, Array x) throws SQLException
-  {
+  public void updateArray(int columnIndex, Array x) throws SQLException {
     String methodCall = "updateArray(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateArray(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -707,30 +562,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Array getArray(String colName) throws SQLException
-  {
+  public Array getArray(String colName) throws SQLException {
     String methodCall = "getArray(" + colName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getArray(colName), colName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateArray(String columnName, Array x) throws SQLException
-  {
+  public void updateArray(String columnName, Array x) throws SQLException {
     String methodCall = "updateArray(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateArray(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -740,12 +587,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public RowId getRowId(int columnIndex) throws SQLException {
     String methodCall = "getRowId(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getRowId(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -754,12 +598,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public RowId getRowId(String columnLabel) throws SQLException {
     String methodCall = "getRowId(" + columnLabel + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getRowId(columnLabel), columnLabel);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -768,12 +609,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateRowId(int columnIndex, RowId x) throws SQLException {
     String methodCall = "updateRowId(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateRowId(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -783,12 +621,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateRowId(String columnLabel, RowId x) throws SQLException {
     String methodCall = "updateRowId(" + columnLabel + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateRowId(columnLabel, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -798,12 +633,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public int getHoldability() throws SQLException {
     String methodCall = "getHoldability()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getHoldability(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -812,12 +644,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public boolean isClosed() throws SQLException {
     String methodCall = "isClosed()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.isClosed(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -826,12 +655,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNString(int columnIndex, String nString) throws SQLException {
     String methodCall = "updateNString(" + columnIndex + ", " + nString + ")";
-    try
-    {
+    try {
       realResultSet.updateNString(columnIndex, nString);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -841,12 +667,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNString(String columnLabel, String nString) throws SQLException {
     String methodCall = "updateNString(" + columnLabel + ", " + nString + ")";
-    try
-    {
+    try {
       realResultSet.updateNString(columnLabel, nString);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -856,12 +679,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
     String methodCall = "updateNClob(" + columnIndex + ", " + nClob + ")";
-    try
-    {
+    try {
       realResultSet.updateNClob(columnIndex, nClob);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -871,12 +691,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNClob(String columnLabel, NClob nClob) throws SQLException {
     String methodCall = "updateNClob(" + columnLabel + ", " + nClob + ")";
-    try
-    {
+    try {
       realResultSet.updateNClob(columnLabel, nClob);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -886,12 +703,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public NClob getNClob(int columnIndex) throws SQLException {
     String methodCall = "getNClob(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getNClob(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -900,12 +714,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public NClob getNClob(String columnLabel) throws SQLException {
     String methodCall = "getNClob(" + columnLabel + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getNClob(columnLabel), columnLabel);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -914,12 +725,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public SQLXML getSQLXML(int columnIndex) throws SQLException {
     String methodCall = "getSQLXML(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getSQLXML(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -928,12 +736,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public SQLXML getSQLXML(String columnLabel) throws SQLException {
     String methodCall = "getSQLXML(" + columnLabel + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getSQLXML(columnLabel), columnLabel);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -942,12 +747,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateSQLXML(int columnIndex, SQLXML xmlObject) throws SQLException {
     String methodCall = "updateSQLXML(" + columnIndex + ", " + xmlObject + ")";
-    try
-    {
+    try {
       realResultSet.updateSQLXML(columnIndex, xmlObject);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -957,12 +759,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateSQLXML(String columnLabel, SQLXML xmlObject) throws SQLException {
     String methodCall = "updateSQLXML(" + columnLabel + ", " + xmlObject + ")";
-    try
-    {
+    try {
       realResultSet.updateSQLXML(columnLabel, xmlObject);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -972,12 +771,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public String getNString(int columnIndex) throws SQLException {
     String methodCall = "getNString(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getNString(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -986,12 +782,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public String getNString(String columnLabel) throws SQLException {
     String methodCall = "getNString(" + columnLabel + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getNString(columnLabel), columnLabel);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1000,12 +793,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public Reader getNCharacterStream(int columnIndex) throws SQLException {
     String methodCall = "getNCharacterStream(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getNCharacterStream(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1014,12 +804,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public Reader getNCharacterStream(String columnLabel) throws SQLException {
     String methodCall = "getNCharacterStream(" + columnLabel + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getNCharacterStream(columnLabel), columnLabel);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1028,12 +815,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
     String methodCall = "updateNCharacterStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateNCharacterStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1043,12 +827,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNCharacterStream(String columnLabel, Reader reader, long length) throws SQLException {
     String methodCall = "updateNCharacterStream(" + columnLabel + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateNCharacterStream(columnLabel, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1058,12 +839,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateAsciiStream(int columnIndex, InputStream x, long length) throws SQLException {
     String methodCall = "updateAsciiStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateAsciiStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1073,12 +851,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBinaryStream(int columnIndex, InputStream x, long length) throws SQLException {
     String methodCall = "updateBinaryStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateBinaryStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1088,12 +863,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateCharacterStream(int columnIndex, Reader x, long length) throws SQLException {
     String methodCall = "updateCharacterStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateCharacterStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1103,12 +875,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateAsciiStream(String columnLabel, InputStream x, long length) throws SQLException {
     String methodCall = "updateAsciiStream(" + columnLabel + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateAsciiStream(columnLabel, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1118,12 +887,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBinaryStream(String columnLabel, InputStream x, long length) throws SQLException {
     String methodCall = "updateBinaryStream(" + columnLabel + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateBinaryStream(columnLabel, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1133,12 +899,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateCharacterStream(String columnLabel, Reader reader, long length) throws SQLException {
     String methodCall = "updateCharacterStream(" + columnLabel + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateCharacterStream(columnLabel, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1148,12 +911,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBlob(int columnIndex, InputStream inputStream, long length) throws SQLException {
     String methodCall = "updateBlob(" + columnIndex + ", " + inputStream + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateBlob(columnIndex, inputStream, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1163,12 +923,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBlob(String columnLabel, InputStream inputStream, long length) throws SQLException {
     String methodCall = "updateBlob(" + columnLabel + ", " + inputStream + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateBlob(columnLabel, inputStream, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1178,12 +935,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateClob(int columnIndex, Reader reader, long length) throws SQLException {
     String methodCall = "updateClob(" + columnIndex + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateClob(columnIndex, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1193,12 +947,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateClob(String columnLabel, Reader reader, long length) throws SQLException {
     String methodCall = "updateClob(" + columnLabel + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateClob(columnLabel, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1208,12 +959,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNClob(int columnIndex, Reader reader, long length) throws SQLException {
     String methodCall = "updateNClob(" + columnIndex + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateNClob(columnIndex, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1223,12 +971,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNClob(String columnLabel, Reader reader, long length) throws SQLException {
     String methodCall = "updateNClob(" + columnLabel + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateNClob(columnLabel, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1238,12 +983,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNCharacterStream(int columnIndex, Reader reader) throws SQLException {
     String methodCall = "updateNCharacterStream(" + columnIndex + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateNCharacterStream(columnIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1253,12 +995,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNCharacterStream(String columnLabel, Reader reader) throws SQLException {
     String methodCall = "updateNCharacterStream(" + columnLabel + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateNCharacterStream(columnLabel, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1268,12 +1007,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateAsciiStream(int columnIndex, InputStream x) throws SQLException {
     String methodCall = "updateAsciiStream(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateAsciiStream(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1283,12 +1019,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBinaryStream(int columnIndex, InputStream x) throws SQLException {
     String methodCall = "updateBinaryStream(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBinaryStream(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1298,12 +1031,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateCharacterStream(int columnIndex, Reader x) throws SQLException {
     String methodCall = "updateCharacterStream(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateCharacterStream(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1313,12 +1043,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateAsciiStream(String columnLabel, InputStream x) throws SQLException {
     String methodCall = "updateAsciiStream(" + columnLabel + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateAsciiStream(columnLabel, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1328,12 +1055,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBinaryStream(String columnLabel, InputStream x) throws SQLException {
     String methodCall = "updateBinaryStream(" + columnLabel + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBinaryStream(columnLabel, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1343,12 +1067,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateCharacterStream(String columnLabel, Reader reader) throws SQLException {
     String methodCall = "updateCharacterStream(" + columnLabel + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateCharacterStream(columnLabel, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1358,12 +1079,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBlob(int columnIndex, InputStream inputStream) throws SQLException {
     String methodCall = "updateBlob(" + columnIndex + ", " + inputStream + ")";
-    try
-    {
+    try {
       realResultSet.updateBlob(columnIndex, inputStream);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1373,12 +1091,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateBlob(String columnLabel, InputStream inputStream) throws SQLException {
     String methodCall = "updateBlob(" + columnLabel + ", " + inputStream + ")";
-    try
-    {
+    try {
       realResultSet.updateBlob(columnLabel, inputStream);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1388,12 +1103,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateClob(int columnIndex, Reader reader) throws SQLException {
     String methodCall = "updateClob(" + columnIndex + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateClob(columnIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1403,12 +1115,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateClob(String columnLabel, Reader reader) throws SQLException {
     String methodCall = "updateClob(" + columnLabel + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateClob(columnLabel, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1418,12 +1127,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNClob(int columnIndex, Reader reader) throws SQLException {
     String methodCall = "updateNClob(" + columnIndex + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateNClob(columnIndex, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1433,12 +1139,9 @@ public class ResultSetSpy implements ResultSet, Spy
   @Override
   public void updateNClob(String columnLabel, Reader reader) throws SQLException {
     String methodCall = "updateNClob(" + columnLabel + ", " + reader + ")";
-    try
-    {
+    try {
       realResultSet.updateNClob(columnLabel, reader);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1446,104 +1149,79 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public boolean isBeforeFirst() throws SQLException
-  {
+  public boolean isBeforeFirst() throws SQLException {
     String methodCall = "isBeforeFirst()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.isBeforeFirst(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public short getShort(int columnIndex) throws SQLException
-  {
+  public short getShort(int columnIndex) throws SQLException {
     String methodCall = "getShort(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getShort(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public short getShort(String columnName) throws SQLException
-  {
+  public short getShort(String columnName) throws SQLException {
     String methodCall = "getShort(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getShort(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public int getInt(int columnIndex) throws SQLException
-  {
+  public int getInt(int columnIndex) throws SQLException {
     String methodCall = "getInt(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getInt(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public int getInt(String columnName) throws SQLException
-  {
+  public int getInt(String columnName) throws SQLException {
     String methodCall = "getInt(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getInt(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void close() throws SQLException
-  {
+  public void close() throws SQLException {
     String methodCall = "close()";
-    try
-    {
-    	//this line fixes the issue 4
-    	//http://code.google.com/p/log4jdbc-log4j2/issues/detail?id=4
-    	//Other alternatives would be possible, for instance,
-    	//externalizing ResultSetCollector calls from reportAllReturns,
-    	//and calling the new method here. This would have required changes to other methods
-    	//of this class.
-    	this.loadMetaDataIfNeeded();
+    try {
+      //this line fixes the issue 4
+      //http://code.google.com/p/log4jdbc-log4j2/issues/detail?id=4
+      //Other alternatives would be possible, for instance,
+      //externalizing ResultSetCollector calls from reportAllReturns,
+      //and calling the new method here. This would have required changes to other methods
+      //of this class.
+      this.loadMetaDataIfNeeded();
 
-    	if (resultSetCollector != null)
-        {
-          // Give the result set collector a chance to fill in unread values from the result set row if that option has been selected
-          resultSetCollector.preMethod(this, methodCall, (Object[]) null);
-        }
+      if (resultSetCollector != null) {
+        // Give the result set collector a chance to fill in unread values from the result set row if that option has been selected
+        resultSetCollector.preMethod(this, methodCall, (Object[]) null);
+      }
 
-        realResultSet.close();
-    }
-    catch (SQLException s)
-    {
+      realResultSet.close();
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1551,75 +1229,55 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public ResultSetMetaData getMetaData() throws SQLException
-  {
+  public ResultSetMetaData getMetaData() throws SQLException {
     String methodCall = "getMetaData()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getMetaData(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public int getType() throws SQLException
-  {
+  public int getType() throws SQLException {
     String methodCall = "getType()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getType(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public double getDouble(int columnIndex) throws SQLException
-  {
+  public double getDouble(int columnIndex) throws SQLException {
     String methodCall = "getDouble(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getDouble(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public double getDouble(String columnName) throws SQLException
-  {
+  public double getDouble(String columnName) throws SQLException {
     String methodCall = "getDouble(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getDouble(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void deleteRow() throws SQLException
-  {
+  public void deleteRow() throws SQLException {
     String methodCall = "deleteRow()";
-    try
-    {
+    try {
       realResultSet.deleteRow();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1627,75 +1285,55 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public int getConcurrency() throws SQLException
-  {
+  public int getConcurrency() throws SQLException {
     String methodCall = "getConcurrency()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getConcurrency(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean rowUpdated() throws SQLException
-  {
+  public boolean rowUpdated() throws SQLException {
     String methodCall = "rowUpdated()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.rowUpdated(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Date getDate(int columnIndex) throws SQLException
-  {
+  public Date getDate(int columnIndex) throws SQLException {
     String methodCall = "getDate(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getDate(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Date getDate(String columnName) throws SQLException
-  {
+  public Date getDate(String columnName) throws SQLException {
     String methodCall = "getDate(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getDate(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Date getDate(int columnIndex, Calendar cal) throws SQLException
-  {
+  public Date getDate(int columnIndex, Calendar cal) throws SQLException {
     String methodCall = "getDate(" + columnIndex + ", " + cal + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getDate(columnIndex, cal), columnIndex, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1703,75 +1341,55 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Date getDate(String columnName, Calendar cal) throws SQLException
-  {
+  public Date getDate(String columnName, Calendar cal) throws SQLException {
     String methodCall = "getDate(" + columnName + ", " + cal + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getDate(columnName, cal), columnName, cal);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean last() throws SQLException
-  {
+  public boolean last() throws SQLException {
     String methodCall = "last()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.last(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean rowInserted() throws SQLException
-  {
+  public boolean rowInserted() throws SQLException {
     String methodCall = "rowInserted()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.rowInserted(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean rowDeleted() throws SQLException
-  {
+  public boolean rowDeleted() throws SQLException {
     String methodCall = "rowDeleted()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.rowDeleted(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateNull(int columnIndex) throws SQLException
-  {
+  public void updateNull(int columnIndex) throws SQLException {
     String methodCall = "updateNull(" + columnIndex + ")";
-    try
-    {
+    try {
       realResultSet.updateNull(columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1779,15 +1397,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateNull(String columnName) throws SQLException
-  {
+  public void updateNull(String columnName) throws SQLException {
     String methodCall = "updateNull(" + columnName + ")";
-    try
-    {
+    try {
       realResultSet.updateNull(columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1795,15 +1409,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateShort(int columnIndex, short x) throws SQLException
-  {
+  public void updateShort(int columnIndex, short x) throws SQLException {
     String methodCall = "updateShort(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateShort(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1811,15 +1421,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateShort(String columnName, short x) throws SQLException
-  {
+  public void updateShort(String columnName, short x) throws SQLException {
     String methodCall = "updateShort(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateShort(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1827,15 +1433,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateBoolean(int columnIndex, boolean x) throws SQLException
-  {
+  public void updateBoolean(int columnIndex, boolean x) throws SQLException {
     String methodCall = "updateBoolean(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBoolean(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1843,15 +1445,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateBoolean(String columnName, boolean x) throws SQLException
-  {
+  public void updateBoolean(String columnName, boolean x) throws SQLException {
     String methodCall = "updateBoolean(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBoolean(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1859,15 +1457,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateByte(int columnIndex, byte x) throws SQLException
-  {
+  public void updateByte(int columnIndex, byte x) throws SQLException {
     String methodCall = "updateByte(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateByte(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1875,15 +1469,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateByte(String columnName, byte x) throws SQLException
-  {
+  public void updateByte(String columnName, byte x) throws SQLException {
     String methodCall = "updateByte(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateByte(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1891,15 +1481,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateInt(int columnIndex, int x) throws SQLException
-  {
+  public void updateInt(int columnIndex, int x) throws SQLException {
     String methodCall = "updateInt(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateInt(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1907,15 +1493,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateInt(String columnName, int x) throws SQLException
-  {
+  public void updateInt(String columnName, int x) throws SQLException {
     String methodCall = "updateInt(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateInt(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1923,80 +1505,59 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Object getObject(int columnIndex) throws SQLException
-  {
+  public Object getObject(int columnIndex) throws SQLException {
     String methodCall = "getObject(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getObject(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Object getObject(String columnName) throws SQLException
-  {
+  public Object getObject(String columnName) throws SQLException {
     String methodCall = "getObject(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getObject(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Object getObject(String colName, Map<String, Class<?>> map) throws SQLException
-  {
+  public Object getObject(String colName, Map<String, Class<?>> map) throws SQLException {
     String methodCall = "getObject(" + colName + ", " + map + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getObject(colName, map), colName, map);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean next() throws SQLException
-  {
+  public boolean next() throws SQLException {
     String methodCall = "next()";
-    try
-    {
-      if (resultSetCollector != null)
-      {
+    try {
+      if (resultSetCollector != null) {
         // Give the result set collector a chance to fill in unread values from the result set row if that option has been selected
         resultSetCollector.preMethod(this, methodCall, (Object[]) null);
       }
       return reportReturn(methodCall, realResultSet.next(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateLong(int columnIndex, long x) throws SQLException
-  {
+  public void updateLong(int columnIndex, long x) throws SQLException {
     String methodCall = "updateLong(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateLong(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2004,15 +1565,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateLong(String columnName, long x) throws SQLException
-  {
+  public void updateLong(String columnName, long x) throws SQLException {
     String methodCall = "updateLong(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateLong(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2020,15 +1577,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateFloat(int columnIndex, float x) throws SQLException
-  {
+  public void updateFloat(int columnIndex, float x) throws SQLException {
     String methodCall = "updateFloat(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateFloat(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2037,15 +1590,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateFloat(String columnName, float x) throws SQLException
-  {
+  public void updateFloat(String columnName, float x) throws SQLException {
     String methodCall = "updateFloat(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateFloat(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2053,15 +1602,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateDouble(int columnIndex, double x) throws SQLException
-  {
+  public void updateDouble(int columnIndex, double x) throws SQLException {
     String methodCall = "updateDouble(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateDouble(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2069,15 +1614,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateDouble(String columnName, double x) throws SQLException
-  {
+  public void updateDouble(String columnName, double x) throws SQLException {
     String methodCall = "updateDouble(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateDouble(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2085,37 +1626,28 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public Statement getStatement() throws SQLException
-  {
+  public Statement getStatement() throws SQLException {
     String methodCall = "getStatement()";
     return (Statement) reportReturn(methodCall, parent);
   }
 
   @Override
-  public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException
-  {
+  public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
     String methodCall = "getObject(" + columnIndex + ", " + map + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getObject(columnIndex, map), columnIndex, map);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateString(int columnIndex, String x) throws SQLException
-  {
+  public void updateString(int columnIndex, String x) throws SQLException {
     String methodCall = "updateString(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateString(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2123,15 +1655,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateString(String columnName, String x) throws SQLException
-  {
+  public void updateString(String columnName, String x) throws SQLException {
     String methodCall = "updateString(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateString(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2139,45 +1667,33 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public InputStream getAsciiStream(int columnIndex) throws SQLException
-  {
+  public InputStream getAsciiStream(int columnIndex) throws SQLException {
     String methodCall = "getAsciiStream(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getAsciiStream(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public InputStream getAsciiStream(String columnName) throws SQLException
-  {
+  public InputStream getAsciiStream(String columnName) throws SQLException {
     String methodCall = "getAsciiStream(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getAsciiStream(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateBigDecimal(int columnIndex, BigDecimal x) throws SQLException
-  {
+  public void updateBigDecimal(int columnIndex, BigDecimal x) throws SQLException {
     String methodCall = "updateBigDecimal(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBigDecimal(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2185,30 +1701,22 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public URL getURL(int columnIndex) throws SQLException
-  {
+  public URL getURL(int columnIndex) throws SQLException {
     String methodCall = "getURL(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getURL(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateBigDecimal(String columnName, BigDecimal x) throws SQLException
-  {
+  public void updateBigDecimal(String columnName, BigDecimal x) throws SQLException {
     String methodCall = "updateBigDecimal(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBigDecimal(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2216,31 +1724,23 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public URL getURL(String columnName) throws SQLException
-  {
+  public URL getURL(String columnName) throws SQLException {
     String methodCall = "getURL(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getURL(columnName), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateBytes(int columnIndex, byte[] x) throws SQLException
-  {
+  public void updateBytes(int columnIndex, byte[] x) throws SQLException {
     // todo: dump array?
     String methodCall = "updateBytes(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBytes(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2248,16 +1748,12 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateBytes(String columnName, byte[] x) throws SQLException
-  {
+  public void updateBytes(String columnName, byte[] x) throws SQLException {
     // todo: dump array?
     String methodCall = "updateBytes(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateBytes(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2268,15 +1764,11 @@ public class ResultSetSpy implements ResultSet, Spy
    * @deprecated
    */
   @Override
-  public InputStream getUnicodeStream(int columnIndex) throws SQLException
-  {
+  public InputStream getUnicodeStream(int columnIndex) throws SQLException {
     String methodCall = "getUnicodeStream(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getUnicodeStream(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2286,45 +1778,33 @@ public class ResultSetSpy implements ResultSet, Spy
    * @deprecated
    */
   @Override
-  public InputStream getUnicodeStream(String columnName) throws SQLException
-  {
+  public InputStream getUnicodeStream(String columnName) throws SQLException {
     String methodCall = "getUnicodeStream(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getUnicodeStream(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateDate(int columnIndex, Date x) throws SQLException
-  {
+  public void updateDate(int columnIndex, Date x) throws SQLException {
     String methodCall = "updateDate(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateDate(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateDate(String columnName, Date x) throws SQLException
-  {
+  public void updateDate(String columnName, Date x) throws SQLException {
     String methodCall = "updateDate(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateDate(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2332,75 +1812,55 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public int getFetchSize() throws SQLException
-  {
+  public int getFetchSize() throws SQLException {
     String methodCall = "getFetchSize()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getFetchSize(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public SQLWarning getWarnings() throws SQLException
-  {
+  public SQLWarning getWarnings() throws SQLException {
     String methodCall = "getWarnings()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getWarnings(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public InputStream getBinaryStream(int columnIndex) throws SQLException
-  {
+  public InputStream getBinaryStream(int columnIndex) throws SQLException {
     String methodCall = "getBinaryStream(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBinaryStream(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public InputStream getBinaryStream(String columnName) throws SQLException
-  {
+  public InputStream getBinaryStream(String columnName) throws SQLException {
     String methodCall = "getBinaryStream(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBinaryStream(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void clearWarnings() throws SQLException
-  {
+  public void clearWarnings() throws SQLException {
     String methodCall = "clearWarnings()";
-    try
-    {
+    try {
       realResultSet.clearWarnings();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2408,15 +1868,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException
-  {
+  public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
     String methodCall = "updateTimestamp(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateTimestamp(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2424,15 +1880,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateTimestamp(String columnName, Timestamp x) throws SQLException
-  {
+  public void updateTimestamp(String columnName, Timestamp x) throws SQLException {
     String methodCall = "updateTimestamp(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateTimestamp(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2440,75 +1892,55 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public boolean first() throws SQLException
-  {
+  public boolean first() throws SQLException {
     String methodCall = "first()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.first(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public String getCursorName() throws SQLException
-  {
+  public String getCursorName() throws SQLException {
     String methodCall = "getCursorName()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getCursorName(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public int findColumn(String columnName) throws SQLException
-  {
+  public int findColumn(String columnName) throws SQLException {
     String methodCall = "findColumn(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.findColumn(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean wasNull() throws SQLException
-  {
+  public boolean wasNull() throws SQLException {
     String methodCall = "wasNull()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.wasNull(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException
-  {
+  public void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException {
     String methodCall = "updateBinaryStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateBinaryStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2516,15 +1948,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateBinaryStream(String columnName, InputStream x, int length) throws SQLException
-  {
+  public void updateBinaryStream(String columnName, InputStream x, int length) throws SQLException {
     String methodCall = "updateBinaryStream(" + columnName + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateBinaryStream(columnName, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2532,75 +1960,55 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public String getString(int columnIndex) throws SQLException
-  {
+  public String getString(int columnIndex) throws SQLException {
     String methodCall = "getString(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getString(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public String getString(String columnName) throws SQLException
-  {
+  public String getString(String columnName) throws SQLException {
     String methodCall = "getString(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getString(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Reader getCharacterStream(int columnIndex) throws SQLException
-  {
+  public Reader getCharacterStream(int columnIndex) throws SQLException {
     String methodCall = "getCharacterStream(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getCharacterStream(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Reader getCharacterStream(String columnName) throws SQLException
-  {
+  public Reader getCharacterStream(String columnName) throws SQLException {
     String methodCall = "getCharacterStream(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getCharacterStream(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void setFetchDirection(int direction) throws SQLException
-  {
+  public void setFetchDirection(int direction) throws SQLException {
     String methodCall = "setFetchDirection(" + direction + ")";
-    try
-    {
+    try {
       realResultSet.setFetchDirection(direction);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2608,15 +2016,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException
-  {
+  public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException {
     String methodCall = "updateCharacterStream(" + columnIndex + ", " + x + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateCharacterStream(columnIndex, x, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2624,15 +2028,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateCharacterStream(String columnName, Reader reader, int length) throws SQLException
-  {
+  public void updateCharacterStream(String columnName, Reader reader, int length) throws SQLException {
     String methodCall = "updateCharacterStream(" + columnName + ", " + reader + ", " + length + ")";
-    try
-    {
+    try {
       realResultSet.updateCharacterStream(columnName, reader, length);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2640,45 +2040,33 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public byte getByte(int columnIndex) throws SQLException
-  {
+  public byte getByte(int columnIndex) throws SQLException {
     String methodCall = "getByte(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getByte(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public byte getByte(String columnName) throws SQLException
-  {
+  public byte getByte(String columnName) throws SQLException {
     String methodCall = "getByte(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getByte(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateTime(int columnIndex, Time x) throws SQLException
-  {
+  public void updateTime(int columnIndex, Time x) throws SQLException {
     String methodCall = "updateTime(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateTime(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2686,15 +2074,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateTime(String columnName, Time x) throws SQLException
-  {
+  public void updateTime(String columnName, Time x) throws SQLException {
     String methodCall = "updateTime(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateTime(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2702,60 +2086,44 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public byte[] getBytes(int columnIndex) throws SQLException
-  {
+  public byte[] getBytes(int columnIndex) throws SQLException {
     String methodCall = "getBytes(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBytes(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public byte[] getBytes(String columnName) throws SQLException
-  {
+  public byte[] getBytes(String columnName) throws SQLException {
     String methodCall = "getBytes(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBytes(columnName), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean isAfterLast() throws SQLException
-  {
+  public boolean isAfterLast() throws SQLException {
     String methodCall = "isAfterLast()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.isAfterLast(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void updateObject(int columnIndex, Object x, int scale) throws SQLException
-  {
+  public void updateObject(int columnIndex, Object x, int scale) throws SQLException {
     String methodCall = "updateObject(" + columnIndex + ", " + x + ", " + scale + ")";
-    try
-    {
+    try {
       realResultSet.updateObject(columnIndex, x, scale);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2763,15 +2131,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateObject(int columnIndex, Object x) throws SQLException
-  {
+  public void updateObject(int columnIndex, Object x) throws SQLException {
     String methodCall = "updateObject(" + columnIndex + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateObject(columnIndex, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2779,15 +2143,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateObject(String columnName, Object x, int scale) throws SQLException
-  {
+  public void updateObject(String columnName, Object x, int scale) throws SQLException {
     String methodCall = "updateObject(" + columnName + ", " + x + ", " + scale + ")";
-    try
-    {
+    try {
       realResultSet.updateObject(columnName, x, scale);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2795,15 +2155,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateObject(String columnName, Object x) throws SQLException
-  {
+  public void updateObject(String columnName, Object x) throws SQLException {
     String methodCall = "updateObject(" + columnName + ", " + x + ")";
-    try
-    {
+    try {
       realResultSet.updateObject(columnName, x);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2811,135 +2167,99 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public int getFetchDirection() throws SQLException
-  {
+  public int getFetchDirection() throws SQLException {
     String methodCall = "getFetchDirection()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getFetchDirection(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public long getLong(int columnIndex) throws SQLException
-  {
+  public long getLong(int columnIndex) throws SQLException {
     String methodCall = "getLong(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getLong(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public long getLong(String columnName) throws SQLException
-  {
+  public long getLong(String columnName) throws SQLException {
     String methodCall = "getLong(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getLong(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean isFirst() throws SQLException
-  {
+  public boolean isFirst() throws SQLException {
     String methodCall = "isFirst()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.isFirst(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void insertRow() throws SQLException
-  {
+  public void insertRow() throws SQLException {
     String methodCall = "insertRow()";
-    try
-    {
+    try {
       realResultSet.insertRow();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public float getFloat(int columnIndex) throws SQLException
-  {
+  public float getFloat(int columnIndex) throws SQLException {
     String methodCall = "getFloat(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getFloat(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public float getFloat(String columnName) throws SQLException
-  {
+  public float getFloat(String columnName) throws SQLException {
     String methodCall = "getFloat(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getFloat(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean isLast() throws SQLException
-  {
+  public boolean isLast() throws SQLException {
     String methodCall = "isLast()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.isLast(), (Object[]) null);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void setFetchSize(int rows) throws SQLException
-  {
+  public void setFetchSize(int rows) throws SQLException {
     String methodCall = "setFetchSize(" + rows + ")";
-    try
-    {
+    try {
       realResultSet.setFetchSize(rows);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2947,15 +2267,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void updateRow() throws SQLException
-  {
+  public void updateRow() throws SQLException {
     String methodCall = "updateRow()";
-    try
-    {
+    try {
       realResultSet.updateRow();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2963,15 +2279,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void beforeFirst() throws SQLException
-  {
+  public void beforeFirst() throws SQLException {
     String methodCall = "beforeFirst()";
-    try
-    {
+    try {
       realResultSet.beforeFirst();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -2982,15 +2294,11 @@ public class ResultSetSpy implements ResultSet, Spy
    * @deprecated
    */
   @Override
-  public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException
-  {
+  public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
     String methodCall = "getBigDecimal(" + columnIndex + ", " + scale + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBigDecimal(columnIndex, scale), columnIndex, scale);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -3000,60 +2308,44 @@ public class ResultSetSpy implements ResultSet, Spy
    * @deprecated
    */
   @Override
-  public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException
-  {
+  public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
     String methodCall = "getBigDecimal(" + columnName + ", " + scale + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBigDecimal(columnName, scale), columnName, scale);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public BigDecimal getBigDecimal(int columnIndex) throws SQLException
-  {
+  public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
     String methodCall = "getBigDecimal(" + columnIndex + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBigDecimal(columnIndex), columnIndex);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public BigDecimal getBigDecimal(String columnName) throws SQLException
-  {
+  public BigDecimal getBigDecimal(String columnName) throws SQLException {
     String methodCall = "getBigDecimal(" + columnName + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realResultSet.getBigDecimal(columnName), columnName);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void afterLast() throws SQLException
-  {
+  public void afterLast() throws SQLException {
     String methodCall = "afterLast()";
-    try
-    {
+    try {
       realResultSet.afterLast();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -3061,15 +2353,11 @@ public class ResultSetSpy implements ResultSet, Spy
   }
 
   @Override
-  public void refreshRow() throws SQLException
-  {
+  public void refreshRow() throws SQLException {
     String methodCall = "refreshRow()";
-    try
-    {
+    try {
       realResultSet.refreshRow();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -3077,60 +2365,45 @@ public class ResultSetSpy implements ResultSet, Spy
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    String methodCall = "unwrap(" + (iface==null?"null":iface.getName()) + ")";
-    try
-    {
+    String methodCall = "unwrap(" + (iface == null ? "null" : iface.getName()) + ")";
+    try {
       //todo: double check this logic
-      return reportReturn(methodCall, (iface != null && (iface == ResultSet.class || iface == Spy.class))?(T)this:realResultSet.unwrap(iface));
-    }
-    catch (SQLException s)
-    {
-      reportException(methodCall,s);
-      throw s;
-    }
-  }
-
-  @Override
-  public boolean isWrapperFor(Class<?> iface) throws SQLException
-  {
-    String methodCall = "isWrapperFor(" + (iface==null?"null":iface.getName()) + ")";
-    try
-    {
-      return reportReturn(methodCall, (iface != null && (iface == ResultSet.class || iface == Spy.class)) ||
-          realResultSet.isWrapperFor(iface));
-    }
-    catch (SQLException s)
-    {
-      reportException(methodCall,s);
-      throw s;
-    }
-  }
-
-  @Override
-  public <T> T getObject(int columnIndex, Class<T> type) throws SQLException
-  {
-    String methodCall = "getObject(" + columnIndex + "," + type+ ")";
-    try
-    {
-      return reportReturn(methodCall, realResultSet.getObject(columnIndex,type));
-    }
-    catch (SQLException s)
-    {
+      return reportReturn(methodCall, (iface != null && (iface == ResultSet.class || iface == Spy.class)) ? (T) this : realResultSet.unwrap(iface));
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public <T> T getObject(String columnLabel, Class<T> type) throws SQLException
-  {
-    String methodCall = "getObject(" + columnLabel + "," + type+ ")";
-    try
-    {
-      return reportReturn(methodCall, realResultSet.getObject(columnLabel,type));
+  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    String methodCall = "isWrapperFor(" + (iface == null ? "null" : iface.getName()) + ")";
+    try {
+      return reportReturn(methodCall, (iface != null && (iface == ResultSet.class || iface == Spy.class)) ||
+          realResultSet.isWrapperFor(iface));
+    } catch (SQLException s) {
+      reportException(methodCall, s);
+      throw s;
     }
-    catch (SQLException s)
-    {
+  }
+
+  @Override
+  public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+    String methodCall = "getObject(" + columnIndex + "," + type + ")";
+    try {
+      return reportReturn(methodCall, realResultSet.getObject(columnIndex, type));
+    } catch (SQLException s) {
+      reportException(methodCall, s);
+      throw s;
+    }
+  }
+
+  @Override
+  public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+    String methodCall = "getObject(" + columnLabel + "," + type + ")";
+    try {
+      return reportReturn(methodCall, realResultSet.getObject(columnLabel, type));
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }

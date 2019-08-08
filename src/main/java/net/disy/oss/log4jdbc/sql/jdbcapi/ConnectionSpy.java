@@ -16,21 +16,20 @@
 package net.disy.oss.log4jdbc.sql.jdbcapi;
 
 import java.sql.Array;
-import java.sql.CallableStatement;
 import java.sql.Blob;
+import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
-import java.sql.SQLClientInfoException;
-import java.sql.SQLXML;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +37,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 import net.disy.oss.log4jdbc.sql.Spy;
 import net.disy.oss.log4jdbc.sql.rdbmsspecifics.RdbmsSpecifics;
-import net.disy.oss.log4jdbc.log.SpyLogDelegator;
 
 /**
  * Wraps a JDBC Connection and reports method calls, returns and exceptions.
@@ -64,8 +63,7 @@ import net.disy.oss.log4jdbc.log.SpyLogDelegator;
  * @author Frederic Bastian
  * @author Mathieu Seppey
  */
-public class ConnectionSpy implements Connection, Spy
-{
+public class ConnectionSpy implements Connection, Spy {
   private Connection realConnection;
 
   /**
@@ -73,8 +71,7 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @return the real underlying Connection.
    */
-  public Connection getRealConnection()
-  {
+  public Connection getRealConnection() {
     return realConnection;
   }
 
@@ -88,7 +85,7 @@ public class ConnectionSpy implements Connection, Spy
    * objects.
    */
   private static final Map<Integer, ConnectionSpy> connectionTracker =
-		  new HashMap<Integer, ConnectionSpy>();
+      new HashMap<Integer, ConnectionSpy>();
 
   /**
    * Get a dump of how many connections are open, and which connection numbers
@@ -96,16 +93,13 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @return an open connection dump.
    */
-  public static String getOpenConnectionsDump()
-  {
+  public static String getOpenConnectionsDump() {
     StringBuilder dump = new StringBuilder();
     int size;
     Integer[] keysArr;
-    synchronized (connectionTracker)
-    {
+    synchronized (connectionTracker) {
       size = connectionTracker.size();
-      if (size==0)
-      {
+      if (size == 0) {
         return "open connections:  none";
       }
       Set<Integer> keys = connectionTracker.keySet();
@@ -115,8 +109,7 @@ public class ConnectionSpy implements Connection, Spy
     Arrays.sort(keysArr);
 
     dump.append("open connections:  ");
-    for (int i=0; i < keysArr.length; i++)
-    {
+    for (int i = 0; i < keysArr.length; i++) {
       dump.append(keysArr[i]);
       dump.append(" ");
     }
@@ -131,12 +124,11 @@ public class ConnectionSpy implements Connection, Spy
    * Create a new ConnectionSpy that wraps a given Connection.
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * @param logDelegator  The <code>SpyLogDelegator</code> used by
    * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
-  public ConnectionSpy(Connection realConnection, SpyLogDelegator logDelegator)
-  {
+  public ConnectionSpy(Connection realConnection, SpyLogDelegator logDelegator) {
     this(realConnection, DriverSpy.defaultRdbmsSpecifics, logDelegator);
   }
 
@@ -144,14 +136,13 @@ public class ConnectionSpy implements Connection, Spy
    * Create a new ConnectionSpy that wraps a given Connection.
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
-   * @param execTime 	a <code>long</code> defining the time in ms
+   * @param execTime  a <code>long</code> defining the time in ms
    * 					taken to open the connection to <code>realConnection</code>.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * @param logDelegator  The <code>SpyLogDelegator</code> used by
    * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
-  public ConnectionSpy(Connection realConnection, long execTime, SpyLogDelegator logDelegator)
-  {
+  public ConnectionSpy(Connection realConnection, long execTime, SpyLogDelegator logDelegator) {
     this(realConnection, null, execTime, logDelegator);
   }
 
@@ -160,13 +151,13 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
    * @param rdbmsSpecifics the RdbmsSpecifics object for formatting logging appropriate for the Rdbms used.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * @param logDelegator  The <code>SpyLogDelegator</code> used by
    * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
-  public ConnectionSpy(Connection realConnection, RdbmsSpecifics rdbmsSpecifics,
-		  SpyLogDelegator logDelegator)
-  {
+  public ConnectionSpy(
+      Connection realConnection, RdbmsSpecifics rdbmsSpecifics,
+      SpyLogDelegator logDelegator) {
     this(realConnection, rdbmsSpecifics, -1L, logDelegator);
   }
 
@@ -175,30 +166,27 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @param realConnection &quot;real&quot; Connection that this ConnectionSpy wraps.
    * @param rdbmsSpecifics the RdbmsSpecifics object for formatting logging appropriate for the Rdbms used.
-   * @param execTime 	a <code>long</code> defining the time in ms
+   * @param execTime  a <code>long</code> defining the time in ms
    * 					taken to open the connection to <code>realConnection</code>.
    * 					Should be equals to -1 if not used.
-   * @param logDelegator 	The <code>SpyLogDelegator</code> used by
+   * @param logDelegator  The <code>SpyLogDelegator</code> used by
    * 						this <code>ConnectionSpy</code> and all resources obtained from it
    * 						(<code>StatementSpy</code>s, ...)
    */
-  public ConnectionSpy(Connection realConnection, RdbmsSpecifics rdbmsSpecifics,
-		  long execTime, SpyLogDelegator logDelegator)
-  {
-    if (rdbmsSpecifics == null)
-    {
+  public ConnectionSpy(
+      Connection realConnection, RdbmsSpecifics rdbmsSpecifics,
+      long execTime, SpyLogDelegator logDelegator) {
+    if (rdbmsSpecifics == null) {
       rdbmsSpecifics = DriverSpy.defaultRdbmsSpecifics;
     }
     setRdbmsSpecifics(rdbmsSpecifics);
-    if (realConnection == null)
-    {
+    if (realConnection == null) {
       throw new IllegalArgumentException("Must pass in a non null real Connection");
     }
     this.realConnection = realConnection;
     log = logDelegator;
 
-    synchronized (connectionTracker)
-    {
+    synchronized (connectionTracker) {
       connectionNumber = ++lastConnectionNumber;
       connectionTracker.put(connectionNumber, this);
     }
@@ -213,8 +201,7 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @param rdbmsSpecifics the RdbmsSpecifics object for formatting logging appropriate for the Rdbms used.
    */
-  void setRdbmsSpecifics(RdbmsSpecifics rdbmsSpecifics)
-  {
+  void setRdbmsSpecifics(RdbmsSpecifics rdbmsSpecifics) {
     this.rdbmsSpecifics = rdbmsSpecifics;
   }
 
@@ -223,131 +210,102 @@ public class ConnectionSpy implements Connection, Spy
    *
    * @return the RdbmsSpecifics object for formatting logging appropriate for the Rdbms used.
    */
-  RdbmsSpecifics getRdbmsSpecifics()
-  {
+  RdbmsSpecifics getRdbmsSpecifics() {
     return rdbmsSpecifics;
   }
 
-  public Integer getConnectionNumber()
-  {
+  public Integer getConnectionNumber() {
     return connectionNumber;
   }
 
-  public String getClassType()
-  {
+  public String getClassType() {
     return "Connection";
   }
 
-  protected void reportException(String methodCall, SQLException exception, String sql)
-  {
+  protected void reportException(String methodCall, SQLException exception, String sql) {
     log.exceptionOccured(this, methodCall, exception, sql, -1L);
   }
 
-  protected void reportException(String methodCall, SQLException exception)
-  {
+  protected void reportException(String methodCall, SQLException exception) {
     log.exceptionOccured(this, methodCall, exception, null, -1L);
   }
 
-  protected void reportException(String methodCall, SQLException exception, long execTime)
-  {
+  protected void reportException(String methodCall, SQLException exception, long execTime) {
     log.exceptionOccured(this, methodCall, exception, null, execTime);
   }
 
-  protected void reportAllReturns(String methodCall, String returnValue)
-  {
+  protected void reportAllReturns(String methodCall, String returnValue) {
     log.methodReturned(this, methodCall, returnValue);
   }
 
-  private boolean reportReturn(String methodCall, boolean value)
-  {
+  private boolean reportReturn(String methodCall, boolean value) {
     reportAllReturns(methodCall, "" + value);
     return value;
   }
 
-  private int reportReturn(String methodCall, int value)
-  {
+  private int reportReturn(String methodCall, int value) {
     reportAllReturns(methodCall, "" + value);
     return value;
   }
 
-  private <T> T reportReturn(String methodCall, T value)
-  {
+  private <T> T reportReturn(String methodCall, T value) {
     reportAllReturns(methodCall, "" + value);
     return value;
   }
 
-  private void reportReturn(String methodCall)
-  {
+  private void reportReturn(String methodCall) {
     reportAllReturns(methodCall, "");
   }
 
-  private void reportClosed(long execTime)
-  {
+  private void reportClosed(long execTime) {
     log.connectionClosed(this, execTime);
   }
 
-  private void reportAborted(long execTime)
-  {
+  private void reportAborted(long execTime) {
     log.connectionAborted(this, execTime);
   }
 
   // forwarding methods
 
   @Override
-  public boolean isClosed() throws SQLException
-  {
+  public boolean isClosed() throws SQLException {
     String methodCall = "isClosed()";
-    try
-    {
+    try {
       return reportReturn(methodCall, (realConnection.isClosed()));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public SQLWarning getWarnings() throws SQLException
-  {
+  public SQLWarning getWarnings() throws SQLException {
     String methodCall = "getWarnings()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getWarnings());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Savepoint setSavepoint() throws SQLException
-  {
+  public Savepoint setSavepoint() throws SQLException {
     String methodCall = "setSavepoint()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.setSavepoint());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void releaseSavepoint(Savepoint savepoint) throws SQLException
-  {
+  public void releaseSavepoint(Savepoint savepoint) throws SQLException {
     String methodCall = "releaseSavepoint(" + savepoint + ")";
-    try
-    {
+    try {
       realConnection.releaseSavepoint(savepoint);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -355,15 +313,11 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public void rollback(Savepoint savepoint) throws SQLException
-  {
+  public void rollback(Savepoint savepoint) throws SQLException {
     String methodCall = "rollback(" + savepoint + ")";
-    try
-    {
+    try {
       realConnection.rollback(savepoint);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -371,30 +325,22 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public DatabaseMetaData getMetaData() throws SQLException
-  {
+  public DatabaseMetaData getMetaData() throws SQLException {
     String methodCall = "getMetaData()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getMetaData());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void clearWarnings() throws SQLException
-  {
+  public void clearWarnings() throws SQLException {
     String methodCall = "clearWarnings()";
-    try
-    {
+    try {
       realConnection.clearWarnings();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -402,64 +348,48 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public Statement createStatement() throws SQLException
-  {
+  public Statement createStatement() throws SQLException {
     String methodCall = "createStatement()";
-    try
-    {
+    try {
       Statement statement = realConnection.createStatement();
       return reportReturn(methodCall, new StatementSpy(this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException
-  {
+  public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
     String methodCall = "createStatement(" + resultSetType + ", " + resultSetConcurrency + ")";
-    try
-    {
+    try {
       Statement statement = realConnection.createStatement(resultSetType, resultSetConcurrency);
       return reportReturn(methodCall, new StatementSpy(this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException
-  {
+  public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
     String methodCall = "createStatement(" + resultSetType + ", " + resultSetConcurrency + ", " + resultSetHoldability + ")";
-    try
-    {
+    try {
       Statement statement = realConnection.createStatement(resultSetType, resultSetConcurrency,
-        resultSetHoldability);
+          resultSetHoldability);
       return reportReturn(methodCall, new StatementSpy(this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void setReadOnly(boolean readOnly) throws SQLException
-  {
+  public void setReadOnly(boolean readOnly) throws SQLException {
     String methodCall = "setReadOnly(" + readOnly + ")";
-    try
-    {
+    try {
       realConnection.setReadOnly(readOnly);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -467,115 +397,88 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public PreparedStatement prepareStatement(String sql) throws SQLException
-  {
+  public PreparedStatement prepareStatement(String sql) throws SQLException {
     String methodCall = "prepareStatement(" + sql + ")";
-    try
-    {
+    try {
       PreparedStatement statement = realConnection.prepareStatement(sql);
       return reportReturn(methodCall, new PreparedStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException
-  {
+  public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
     String methodCall = "prepareStatement(" + sql + ", " + autoGeneratedKeys + ")";
-    try
-    {
+    try {
       PreparedStatement statement = realConnection.prepareStatement(sql, autoGeneratedKeys);
       return reportReturn(methodCall, new PreparedStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException
-  {
+  public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
     String methodCall = "prepareStatement(" + sql + ", " + resultSetType + ", " + resultSetConcurrency + ")";
-    try
-    {
+    try {
       PreparedStatement statement = realConnection.prepareStatement(sql, resultSetType, resultSetConcurrency);
       return reportReturn(methodCall, new PreparedStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-                                            int resultSetHoldability) throws SQLException
-  {
+  public PreparedStatement prepareStatement(
+      String sql, int resultSetType, int resultSetConcurrency,
+      int resultSetHoldability) throws SQLException {
     String methodCall = "prepareStatement(" + sql + ", " + resultSetType + ", " + resultSetConcurrency + ", " + resultSetHoldability + ")";
-    try
-    {
+    try {
       PreparedStatement statement = realConnection.prepareStatement(sql, resultSetType, resultSetConcurrency,
-        resultSetHoldability);
+          resultSetHoldability);
       return reportReturn(methodCall, new PreparedStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public PreparedStatement prepareStatement(String sql, int columnIndexes[]) throws SQLException
-  {
+  public PreparedStatement prepareStatement(String sql, int columnIndexes[]) throws SQLException {
     //todo: dump the array here?
     String methodCall = "prepareStatement(" + sql + ", " + columnIndexes + ")";
-    try
-    {
+    try {
       PreparedStatement statement = realConnection.prepareStatement(sql, columnIndexes);
       return reportReturn(methodCall, new PreparedStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public Savepoint setSavepoint(String name) throws SQLException
-  {
+  public Savepoint setSavepoint(String name) throws SQLException {
     String methodCall = "setSavepoint(" + name + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.setSavepoint(name));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public PreparedStatement prepareStatement(String sql, String columnNames[]) throws SQLException
-  {
+  public PreparedStatement prepareStatement(String sql, String columnNames[]) throws SQLException {
     //todo: dump the array here?
     String methodCall = "prepareStatement(" + sql + ", " + columnNames + ")";
-    try
-    {
+    try {
       PreparedStatement statement = realConnection.prepareStatement(sql, columnNames);
       return reportReturn(methodCall, new PreparedStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
@@ -584,12 +487,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public Clob createClob() throws SQLException {
     String methodCall = "createClob()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.createClob());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -598,12 +498,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public Blob createBlob() throws SQLException {
     String methodCall = "createBlob()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.createBlob());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -612,12 +509,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public NClob createNClob() throws SQLException {
     String methodCall = "createNClob()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.createNClob());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -626,12 +520,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public SQLXML createSQLXML() throws SQLException {
     String methodCall = "createSQLXML()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.createSQLXML());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -640,12 +531,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public boolean isValid(int timeout) throws SQLException {
     String methodCall = "isValid(" + timeout + ")";
-    try
-    {
-      return reportReturn(methodCall,realConnection.isValid(timeout));
-    }
-    catch (SQLException s)
-    {
+    try {
+      return reportReturn(methodCall, realConnection.isValid(timeout));
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -654,12 +542,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public void setClientInfo(String name, String value) throws SQLClientInfoException {
     String methodCall = "setClientInfo(" + name + ", " + value + ")";
-    try
-    {
-      realConnection.setClientInfo(name,value);
-    }
-    catch (SQLClientInfoException s)
-    {
+    try {
+      realConnection.setClientInfo(name, value);
+    } catch (SQLClientInfoException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -670,12 +555,9 @@ public class ConnectionSpy implements Connection, Spy
   public void setClientInfo(Properties properties) throws SQLClientInfoException {
     // todo: dump properties?
     String methodCall = "setClientInfo(" + properties + ")";
-    try
-    {
+    try {
       realConnection.setClientInfo(properties);
-    }
-    catch (SQLClientInfoException s)
-    {
+    } catch (SQLClientInfoException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -685,12 +567,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public String getClientInfo(String name) throws SQLException {
     String methodCall = "getClientInfo(" + name + ")";
-    try
-    {
-      return reportReturn(methodCall,realConnection.getClientInfo(name));
-    }
-    catch (SQLException s)
-    {
+    try {
+      return reportReturn(methodCall, realConnection.getClientInfo(name));
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -699,12 +578,9 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public Properties getClientInfo() throws SQLException {
     String methodCall = "getClientInfo()";
-    try
-    {
-      return reportReturn(methodCall,realConnection.getClientInfo());
-    }
-    catch (SQLException s)
-    {
+    try {
+      return reportReturn(methodCall, realConnection.getClientInfo());
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -713,13 +589,10 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
     //todo: dump elements?
-    String methodCall = "createArrayOf(" + typeName + ", " + elements +")";
-    try
-    {
-      return reportReturn(methodCall,realConnection.createArrayOf(typeName,elements));
-    }
-    catch (SQLException s)
-    {
+    String methodCall = "createArrayOf(" + typeName + ", " + elements + ")";
+    try {
+      return reportReturn(methodCall, realConnection.createArrayOf(typeName, elements));
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -728,43 +601,32 @@ public class ConnectionSpy implements Connection, Spy
   @Override
   public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
     //todo: dump attributes?
-    String methodCall = "createStruct(" + typeName + ", " + attributes +")";
-    try
-    {
-      return reportReturn(methodCall,realConnection.createStruct(typeName, attributes));
-    }
-    catch (SQLException s)
-    {
+    String methodCall = "createStruct(" + typeName + ", " + attributes + ")";
+    try {
+      return reportReturn(methodCall, realConnection.createStruct(typeName, attributes));
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean isReadOnly() throws SQLException
-  {
+  public boolean isReadOnly() throws SQLException {
     String methodCall = "isReadOnly()";
-    try
-    {
-      return reportReturn(methodCall,realConnection.isReadOnly());
-    }
-    catch (SQLException s)
-    {
+    try {
+      return reportReturn(methodCall, realConnection.isReadOnly());
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void setHoldability(int holdability) throws SQLException
-  {
+  public void setHoldability(int holdability) throws SQLException {
     String methodCall = "setHoldability(" + holdability + ")";
-    try
-    {
+    try {
       realConnection.setHoldability(holdability);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -772,65 +634,50 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public CallableStatement prepareCall(String sql) throws SQLException
-  {
+  public CallableStatement prepareCall(String sql) throws SQLException {
     String methodCall = "prepareCall(" + sql + ")";
-    try
-    {
+    try {
       CallableStatement statement = realConnection.prepareCall(sql);
       return reportReturn(methodCall, new CallableStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException
-  {
+  public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
     String methodCall = "prepareCall(" + sql + ", " + resultSetType + ", " + resultSetConcurrency + ")";
-    try
-    {
+    try {
       CallableStatement statement = realConnection.prepareCall(sql, resultSetType, resultSetConcurrency);
       return reportReturn(methodCall, new CallableStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-                                       int resultSetHoldability) throws SQLException
-  {
+  public CallableStatement prepareCall(
+      String sql, int resultSetType, int resultSetConcurrency,
+      int resultSetHoldability) throws SQLException {
     String methodCall = "prepareCall(" + sql + ", " + resultSetType + ", " + resultSetConcurrency + ", " + resultSetHoldability + ")";
-    try
-    {
+    try {
       CallableStatement statement = realConnection.prepareCall(sql, resultSetType, resultSetConcurrency,
-        resultSetHoldability);
+          resultSetHoldability);
       return reportReturn(methodCall, new CallableStatementSpy(sql, this, statement, this.log));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public void setCatalog(String catalog) throws SQLException
-  {
+  public void setCatalog(String catalog) throws SQLException {
     String methodCall = "setCatalog(" + catalog + ")";
-    try
-    {
+    try {
       realConnection.setCatalog(catalog);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -838,45 +685,33 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public String nativeSQL(String sql) throws SQLException
-  {
+  public String nativeSQL(String sql) throws SQLException {
     String methodCall = "nativeSQL(" + sql + ")";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.nativeSQL(sql));
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, sql);
       throw s;
     }
   }
 
   @Override
-  public Map<String,Class<?>> getTypeMap() throws SQLException
-  {
+  public Map<String, Class<?>> getTypeMap() throws SQLException {
     String methodCall = "getTypeMap()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getTypeMap());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void setAutoCommit(boolean autoCommit) throws SQLException
-  {
+  public void setAutoCommit(boolean autoCommit) throws SQLException {
     String methodCall = "setAutoCommit(" + autoCommit + ")";
-    try
-    {
+    try {
       realConnection.setAutoCommit(autoCommit);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -884,31 +719,23 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public String getCatalog() throws SQLException
-  {
+  public String getCatalog() throws SQLException {
     String methodCall = "getCatalog()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getCatalog());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void setTypeMap(java.util.Map<String,Class<?>> map) throws SQLException
-  {
+  public void setTypeMap(java.util.Map<String, Class<?>> map) throws SQLException {
     //todo: dump map??
     String methodCall = "setTypeMap(" + map + ")";
-    try
-    {
+    try {
       realConnection.setTypeMap(map);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -916,15 +743,11 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public void setTransactionIsolation(int level) throws SQLException
-  {
+  public void setTransactionIsolation(int level) throws SQLException {
     String methodCall = "setTransactionIsolation(" + level + ")";
-    try
-    {
+    try {
       realConnection.setTransactionIsolation(level);
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -932,60 +755,44 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public boolean getAutoCommit() throws SQLException
-  {
+  public boolean getAutoCommit() throws SQLException {
     String methodCall = "getAutoCommit()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getAutoCommit());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public int getHoldability() throws SQLException
-  {
+  public int getHoldability() throws SQLException {
     String methodCall = "getHoldability()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getHoldability());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public int getTransactionIsolation() throws SQLException
-  {
+  public int getTransactionIsolation() throws SQLException {
     String methodCall = "getTransactionIsolation()";
-    try
-    {
+    try {
       return reportReturn(methodCall, realConnection.getTransactionIsolation());
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public void commit() throws SQLException
-  {
+  public void commit() throws SQLException {
     String methodCall = "commit()";
-    try
-    {
+    try {
       realConnection.commit();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -993,15 +800,11 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public void rollback() throws SQLException
-  {
+  public void rollback() throws SQLException {
     String methodCall = "rollback()";
-    try
-    {
+    try {
       realConnection.rollback();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s);
       throw s;
     }
@@ -1009,23 +812,16 @@ public class ConnectionSpy implements Connection, Spy
   }
 
   @Override
-  public void close() throws SQLException
-  {
+  public void close() throws SQLException {
     String methodCall = "close()";
     long tstart = System.currentTimeMillis();
-    try
-    {
+    try {
       realConnection.close();
-    }
-    catch (SQLException s)
-    {
+    } catch (SQLException s) {
       reportException(methodCall, s, System.currentTimeMillis() - tstart);
       throw s;
-    }
-    finally
-    {
-      synchronized (connectionTracker)
-      {
+    } finally {
+      synchronized (connectionTracker) {
         connectionTracker.remove(connectionNumber);
       }
       reportClosed(System.currentTimeMillis() - tstart);
@@ -1035,108 +831,82 @@ public class ConnectionSpy implements Connection, Spy
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    String methodCall = "unwrap(" + (iface==null?"null":iface.getName()) + ")";
-    try
-    {
+    String methodCall = "unwrap(" + (iface == null ? "null" : iface.getName()) + ")";
+    try {
       //todo: double check this logic
-      return (T)reportReturn(methodCall, (iface != null && (iface == Connection.class || iface == Spy.class))?(T)this:realConnection.unwrap(iface));
-    }
-    catch (SQLException s)
-    {
-      reportException(methodCall,s);
+      return (T) reportReturn(methodCall, (iface != null && (iface == Connection.class || iface == Spy.class)) ? (T) this : realConnection.unwrap(iface));
+    } catch (SQLException s) {
+      reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-  public boolean isWrapperFor(Class<?> iface) throws SQLException
-  {
-    String methodCall = "isWrapperFor(" + (iface==null?"null":iface.getName()) + ")";
-    try
-    {
+  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    String methodCall = "isWrapperFor(" + (iface == null ? "null" : iface.getName()) + ")";
+    try {
       return reportReturn(methodCall, (iface != null && (iface == Connection.class || iface == Spy.class)) ||
           realConnection.isWrapperFor(iface));
-    }
-    catch (SQLException s)
-    {
-      reportException(methodCall,s);
+    } catch (SQLException s) {
+      reportException(methodCall, s);
       throw s;
     }
   }
 
   @Override
-	public void setSchema(String schema) throws SQLException
-	{
-		String methodCall = "setSchema(" + schema + ")";
-		try
-		{
-			realConnection.setSchema(schema);
-		}
-		catch (SQLException s)
-		{
-			reportException(methodCall,s);
-			throw s;
-		}
-	}
+  public void setSchema(String schema) throws SQLException {
+    String methodCall = "setSchema(" + schema + ")";
+    try {
+      realConnection.setSchema(schema);
+    } catch (SQLException s) {
+      reportException(methodCall, s);
+      throw s;
+    }
+  }
 
   @Override
-	public String getSchema() throws SQLException
-	{
-		String methodCall = "getSchema()";
-		try
-		{
-			return reportReturn(methodCall,realConnection.getSchema());
-		}
-		catch (SQLException s)
-		{
-			reportException(methodCall,s);
-			throw s;
-		}
-	}
+  public String getSchema() throws SQLException {
+    String methodCall = "getSchema()";
+    try {
+      return reportReturn(methodCall, realConnection.getSchema());
+    } catch (SQLException s) {
+      reportException(methodCall, s);
+      throw s;
+    }
+  }
 
   @Override
-	public void abort(Executor executor) throws SQLException
-	{
-		String methodCall = "abort(" + executor + ")";
-		long tstart = System.currentTimeMillis();
-		try
-		{
-			realConnection.abort(executor);
-			reportAborted(System.currentTimeMillis() - tstart);
-		}
-		catch (SQLException s)
-		{
-		    reportException(methodCall, s, System.currentTimeMillis() - tstart);
-			throw s;
-		}
-	}
+  public void abort(Executor executor) throws SQLException {
+    String methodCall = "abort(" + executor + ")";
+    long tstart = System.currentTimeMillis();
+    try {
+      realConnection.abort(executor);
+      reportAborted(System.currentTimeMillis() - tstart);
+    } catch (SQLException s) {
+      reportException(methodCall, s, System.currentTimeMillis() - tstart);
+      throw s;
+    }
+  }
 
   @Override
-	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException
-	{
-		String methodCall = "setNetworkTimeout(" + executor + ", " + milliseconds + ";";
-		try
-		{
-			realConnection.setNetworkTimeout(executor,milliseconds);
-		}
-		catch (SQLException s)
-		{
-			reportException(methodCall,s);
-			throw s;
-		}
-	}
+  public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+    String methodCall = "setNetworkTimeout(" + executor + ", " + milliseconds + ";";
+    try {
+      realConnection.setNetworkTimeout(executor, milliseconds);
+    } catch (SQLException s) {
+      reportException(methodCall, s);
+      throw s;
+    }
+  }
 
-	@Override
-	public int getNetworkTimeout() throws SQLException {
-		String methodCall = "getNetworkTimeout()";
-		try
-		{
-			return reportReturn(methodCall, realConnection.getNetworkTimeout());
-		}
-		catch (SQLException s)
-		{
-			reportException(methodCall,s);
-			throw s;
-		}
-	}
+  @Override
+  public int getNetworkTimeout() throws SQLException {
+    String methodCall = "getNetworkTimeout()";
+    try {
+      return reportReturn(methodCall, realConnection.getNetworkTimeout());
+    } catch (SQLException s) {
+      reportException(methodCall, s);
+      throw s;
+    }
+  }
 }

@@ -22,8 +22,7 @@ package net.disy.oss.log4jdbc.sql;
  *
  * @author Arthur Blake
  */
-public interface Spy
-{
+public interface Spy {
 
   /**
    * Get the type of class being spied upon.  For example, "Statement", "ResultSet", etc.
