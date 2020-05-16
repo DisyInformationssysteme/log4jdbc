@@ -19,6 +19,7 @@ import net.disy.oss.log4jdbc.Properties;
  * (avoid useless strings concatenations for instance).
  *
  * @author Frederic Bastian
+ * @author Arthur Blake
  * @version 1.0
  * @since 1.0
  */
@@ -97,7 +98,6 @@ public abstract class SqlMessage {
    *
    * @param sql SQL to break up.
    * @return SQL broken up into multiple lines
-   * @author Arthur Blake
    */
   protected String processSql(String sql) {
     if (sql == null) {
@@ -183,14 +183,13 @@ public abstract class SqlMessage {
   /**
    * Get debugging info - the module and line number that called the logger
    * version that prints the stack trace information from the point just before
-   * we got it (net.sf.log4jdbc)
+   * we got it (net.disy.oss.log4jdbc)
    *
-   * if the optional log4jdbc.debug.stack.prefix system property is defined then
+   * If the optional log4jdbc.debug.stack.prefix system property is defined then
    * the last call point from an application is shown in the debug
    * trace output, instead of the last direct caller into log4jdbc
    *
    * @return debugging info for whoever called into JDBC from within the application.
-   * @author Arthur Blake
    */
   protected static String getDebugInfo() {
     Throwable t = new Throwable();
@@ -211,7 +210,7 @@ public abstract class SqlMessage {
         boolean first = true;
         for (int i = 0; i < stackTrace.length; i++) {
           className = stackTrace[i].getClassName();
-          if (!className.startsWith("net.sf.log4jdbc")) {
+          if (!className.startsWith("net.disy.oss.log4jdbc")) {
             if (first) {
               first = false;
             } else {

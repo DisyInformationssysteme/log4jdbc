@@ -81,11 +81,10 @@ public class ResultSetSpy implements ResultSet, Spy {
   }
 
   /**
-   * Report (for logging) that a method returned.  All the other reportReturn methods are convenience methods that call
-   * this method.
+   * Report (for logging) that a method returned.
+   * All the other reportReturn methods are convenience methods that call this method.
    *
    * @param methodCall description of method call and arguments passed to it that returned.
-   * @param msg description of what the return value that was returned.  may be an empty String for void return types.
    */
   protected void reportAllReturns(String methodCall, Object returnValue, Object... methodParams) {
 
