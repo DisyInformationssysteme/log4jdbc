@@ -133,4 +133,16 @@
     </license>
   </licenses>
 
+  <developers>
+    <developer>
+      <id>DisyInformationssysteme</id>
+      <name>Various Authors</name>
+      <email>oss@disy.net</email>
+      <url>https://github.com/DisyInformationssysteme</url>
+      <roles>
+        <role>current maintainers</role>
+      </roles>
+    </developer>
+  </developers>
+
 </project>
