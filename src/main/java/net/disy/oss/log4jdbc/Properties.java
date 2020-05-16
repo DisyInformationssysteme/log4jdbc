@@ -32,8 +32,8 @@ import net.disy.oss.log4jdbc.log.SpyLogFactory;
  * <code>getSpyLogDelegatorName()</code>.
  * Corresponds to the property "log4jdbc.spylogdelegator.name".
  * Define the class implementing <code>SpyLogDelegator</code> to load.
- * Default is <code>net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator</code>.
- * <code>net.sf.log4jdbc.SpyLogFactory</code> has been modified accordingly.
+ * Default is <code>net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator</code>.
+ * <code>net.disy.oss.log4jdbc.log.SpyLogFactory</code> has been modified accordingly.
  * <li><code>DebugStackPrefix</code> is now a <code>String</code> corresponding to a REGEX,
  * not only to the beginning of the package name (this can obviously done using "^").
  * This is true only if log4j2 is used (see <code>SpyLogDelegatorName</code>),
@@ -53,7 +53,7 @@ public final class Properties {
    * A <code>String</code> representing the name of the class implementing
    * <code>SpyLogDelegator</code> to use. It is used by {@link SpyLogFactory}
    * to determine which class to load.
-   * Default is <code>net.sf.log4jdbc.log4j2.Log4j2SpyLogDelegator</code>
+   * Default is <code>net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator</code>
    *
    * @see SpyLogFactory
    */

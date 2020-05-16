@@ -228,7 +228,7 @@ public abstract class SqlMessage {
 
         for (int i = 0; i < stackTrace.length; i++) {
           className = stackTrace[i].getClassName();
-          if (className.startsWith("net.sf.log4jdbc")) {
+          if (className.startsWith("net.disy.oss.log4jdbc")) {
             firstLog4jdbcCall = i;
 
           } else if (Properties.isTraceFromApplication() &&

@@ -366,7 +366,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator {
   /**
    * Get debugging info - the module and line number that called the logger
    * version that prints the stack trace information from the point just before
-   * we got it (net.sf.log4jdbc)
+   * we got it (net.disy.oss.log4jdbc)
    *
    * if the optional log4jdbc.debug.stack.prefix system property is defined then
    * the last call point from an application is shown in the debug
@@ -394,7 +394,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator {
         boolean first = true;
         for (int i = 0; i < stackTrace.length; i++) {
           className = stackTrace[i].getClassName();
-          if (!className.startsWith("net.sf.log4jdbc")) {
+          if (!className.startsWith("net.disy.oss.log4jdbc")) {
             if (first) {
               first = false;
             } else {
@@ -412,7 +412,7 @@ public class Slf4jSpyLogDelegator implements SpyLogDelegator {
 
         for (int i = 0; i < stackTrace.length; i++) {
           className = stackTrace[i].getClassName();
-          if (className.startsWith("net.sf.log4jdbc")) {
+          if (className.startsWith("net.disy.oss.log4jdbc")) {
             firstLog4jdbcCall = i;
           } else if (Properties.isTraceFromApplication() &&
               Pattern.matches(Properties.getDebugStackPrefix(), className)) {

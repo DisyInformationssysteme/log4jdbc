@@ -27,7 +27,7 @@ import net.disy.oss.log4jdbc.log.log4j2.Log4j2SpyLogDelegator;
  * <li>addition of the <code>#loadSpyLogDelegator()</code> method
  * to choose between the new <code>Log4j2SpyLogDelegator</code>,
  * or an alternative <code>SpyLogDelegator</code>.
- * This method uses <code>net.sf.log4jdbc.log4j2.Properties#getSpyLogDelegatorName()</code>
+ * This method uses <code>net.disy.oss.log4jdbc.Properties#getSpyLogDelegatorName()</code>
  * to determine which logger to use.
  * <li>Use of this method to set the <code>logger</code> attribute
  * if <code>null</code> when calling <code>#getSpyLogDelegator()</code>.

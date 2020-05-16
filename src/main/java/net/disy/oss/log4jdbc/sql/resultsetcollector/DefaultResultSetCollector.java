@@ -180,9 +180,8 @@ public class DefaultResultSetCollector implements ResultSetCollector {
   /*
    * (non-Javadoc)
    *
-   * @see net.sf.log4jdbc.ResultSetCollector#methodReturned(net.sf.log4jdbc.
-   * ResultSetSpy, java.lang.String, java.lang.Object, java.lang.Object,
-   * java.lang.Object)
+   * See net.disy.oss.log4jdbc.sql.resultsetcollector.ResultSetCollector#methodReturned(
+   *   net.disy.oss.log4jdbc.sql.jdbcapi.ResultSetSpy, java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)
    */
   @Override
   public boolean methodReturned(
