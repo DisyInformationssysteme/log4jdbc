@@ -35,7 +35,7 @@ import net.disy.oss.log4jdbc.sql.Spy;
  *
  * This can be useful in a Spring context. Imagine your spring context includes this datasource definition
  *
- * <code><pre>
+ * <pre>{@code
  *  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
  *      <property name="driverClass" value="${datasource.driverClassName}"/>
  *       <property name="jdbcUrl" value="${datasource.url}"/>
@@ -46,11 +46,11 @@ import net.disy.oss.log4jdbc.sql.Spy;
  *       <property name="maxPoolSize" value="${datasource.maxPoolSize}" />
  *       <property name="maxStatements" value="${datasource.maxStatements}" />
  *   </bean>
- * </pre></code>
+ * }</pre>
  *
  * You can get log4jdbc to work on this using the following config changes
  *
- * <code><pre>
+ * <pre>{@code
  *  <bean id="dataSourceSpied" class="com.mchange.v2.c3p0.ComboPooledDataSource">
  *      <property name="driverClass" value="${datasource.driverClassName}"/>
  *       <property name="jdbcUrl" value="${datasource.url}"/>
@@ -65,7 +65,7 @@ import net.disy.oss.log4jdbc.sql.Spy;
  *   <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
  *     <constructor-arg ref="dataSourceSpied" />
  *   </bean>
- * </pre></code>
+ * }</pre>
  *
  *
  * @author tim.azzopardi Log4jdbcProxyDataSource.java
