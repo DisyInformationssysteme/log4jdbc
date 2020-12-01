@@ -199,6 +199,7 @@ public class DefaultResultSetCollector implements ResultSetCollector {
     }
     if (methodCall.equals("wasNull()") && getColumnCount() != 0) {
       if (Boolean.TRUE.equals(returnValue)) {
+        makeRowIfNeeded();
         row.set(colIndex - 1, NULL_RESULT_SET_VAL);
       }
     }
