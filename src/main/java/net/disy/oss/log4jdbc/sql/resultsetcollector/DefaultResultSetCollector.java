@@ -24,9 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.disy.oss.log4jdbc.sql.jdbcapi.ResultSetSpy;
 
 public class DefaultResultSetCollector implements ResultSetCollector {
+
+  private static final Logger logger = LoggerFactory.getLogger(DefaultResultSetCollector.class);
 
   private static final String NULL_RESULT_SET_VAL = "[null]";
   private static final String UNREAD = "[unread]";
@@ -189,7 +194,6 @@ public class DefaultResultSetCollector implements ResultSetCollector {
       Object targetObject, Object... methodParams) {
 
     if (methodCall.startsWith("get") && methodParams != null && methodParams.length == 1) {
-
       String methodName = methodCall.substring(0, methodCall.indexOf('('));
       if (GETTERS.contains(methodName) && getColumnCount() != 0) {
         setColIndexFromGetXXXMethodParams(methodParams);
@@ -197,17 +201,30 @@ public class DefaultResultSetCollector implements ResultSetCollector {
         row.set(colIndex - 1, returnValue);
       }
     }
-    if (methodCall.equals("wasNull()") && getColumnCount() != 0) {
-      if (Boolean.TRUE.equals(returnValue)) {
-        makeRowIfNeeded();
-        row.set(colIndex - 1, NULL_RESULT_SET_VAL);
+    try {
+      if (methodCall.equals("wasNull()") && getColumnCount() != 0) {
+        if (Boolean.TRUE.equals(returnValue)) {
+          makeRowIfNeeded();
+          logger.info("methodReturned (wasNull) running, values are:\ngetColumnCount: {}, colIndex: {}, row: {}",
+              getColumnCount(), colIndex, row);
+          if (colIndex != -1) {
+            row.set(colIndex - 1, NULL_RESULT_SET_VAL);
+          } else {
+            for (int i = 0; i < getColumnCount(); ++i) {
+              row.set(i, NULL_RESULT_SET_VAL);
+            }
+          }
+        }
       }
+    } catch (Exception ex) {
+      logger.error("methodReturned failed, values were:\ngetColumnCount: {}, colIndex: {}, row: {}",
+          getColumnCount(), colIndex, row);
+      throw ex;
     }
     if ("next()".equals(methodCall) || "first()".equals(methodCall)) {
       this.lastValueReturnedByNext = (Boolean) returnValue;
     }
-    if ("next()".equals(methodCall) || "first()".equals(methodCall) ||
-        "close()".equals(methodCall)) {
+    if ("next()".equals(methodCall) || "first()".equals(methodCall) || "close()".equals(methodCall)) {
       loadMetaDataIfNeeded(resultSetSpy.getRealResultSet());
       boolean isEndOfResultSet =
           //"close" triggers a printing only if the previous call to next
