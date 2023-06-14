@@ -16,6 +16,6 @@ This library is is a modernized and maintained fork of the defunct org.bgee.log4
 <dependency>
   <groupId>net.disy.oss</groupId>
   <artifactId>log4jdbc</artifactId>
-  <version>2.0</version>
+  <version>3.0.0</version>
 </dependency>
 ```
